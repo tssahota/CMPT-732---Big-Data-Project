@@ -66,7 +66,7 @@ movie_schema = types.StructType(
 
 
 def main(inputs, output):
-    movie_data = spark.read.csv(inputs, schema=movie_schema)
+    movie_data = spark.read.csv(inputs, schema=movie_schema, header=True)
     movie_data = movie_data.select(movie_data['adult'].cast('boolean'),
                                    movie_data['belongs_to_collection'],
                                    movie_data['budget'].cast('int'),
@@ -103,6 +103,3 @@ if __name__ == '__main__':
     spark.sparkContext.setLogLevel("WARN")
     sc = spark.sparkContext
     main(inputs, outputs)
-
-
-
