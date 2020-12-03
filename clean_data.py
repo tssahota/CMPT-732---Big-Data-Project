@@ -1,6 +1,6 @@
 import sys
 assert sys.version_info >= (3, 5)  # make sure we have Python 3.5+
-from pyspark.sql import SparkSession, functions, types, Row
+from pyspark.sql import SparkSession, functions, types
 
 def calculate_return(revenue, budget):
     if revenue and budget:
@@ -10,6 +10,7 @@ def calculate_return(revenue, budget):
 
 def main(inputs, output):
     movie_data = spark.read.csv(inputs, header=True)
+    movie_data.describe('popularity').show()
     #change all revenue and budget == 0 to null to avoid calculation error 
     movie_data = movie_data.select(movie_data['adult'].cast('boolean'),
                                    movie_data['belongs_to_collection'],
@@ -47,12 +48,15 @@ def main(inputs, output):
     #check dataframe
     #movie_data = movie_data.select(movie_data['revenue'], movie_data['budget'], movie_data['return'])
     #movie_data.show(100)
+    movie_data.describe('popularity').show()
+    sorted_popularity = movie_data.sort('popularity', ascending=False)
+    sorted_popularity.select(sorted_popularity['title'], sorted_popularity['tagline'], sorted_popularity['popularity']).show(10)
     movie_data.write.parquet(output, mode='overwrite')
 
 if __name__ == '__main__':
     input = sys.argv[1]
     output = sys.argv[2]
-    spark = SparkSession.builder.appName("correlate_logs").getOrCreate()
+    spark = SparkSession.builder.appName("clean_data").getOrCreate()
     assert spark.version >= "2.4"  # make sure we have Spark 2.4+
     spark.sparkContext.setLogLevel("WARN")
     sc = spark.sparkContext
