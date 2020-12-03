@@ -7,7 +7,7 @@ from pyspark.sql import SparkSession, functions, types, Row
 movie_schema = types.StructType(
     [
         types.StructField("adult", types.BooleanType()),
-        types.StructField("belongs_to_collection", types.MapType(types.IntegerType(), types.StringType(), types.StringType(), types.StringType(), types.StringType())),
+        types.StructField("belongs_to_collection", types.MapType(types.StringType(), types.IntegerType(), True)),
         #types.StructField("belongs_to_collection", types.StringType()),
         types.StructField("budget", types.IntegerType()),
         #types.StructField("genres", types.ArrayType(types.MapType(types.IntegerType(), types.StringType()))),
@@ -31,15 +31,18 @@ movie_schema = types.StructType(
     ]
 )
 
-def main(inputs, output):
-    movie_data = spark.read.csv(inputs, sep=",", schema=movie_schema)
-    movie_data.show(20)
+def main(input, output):
+    #rdd = sc.textFile(input)
+    #print(rdd.take(2)) , inferSchema='True', header='True'
+    movie_data = spark.read.csv(input, sep=",", schema=movie_schema)
+    movie_data.show(10)
+    movie_data.printSchema()
 
 if __name__ == '__main__':
-    inputs = sys.argv[1]
-    outputs = sys.argv[2]
+    input = sys.argv[1]
+    output = sys.argv[2]
     spark = SparkSession.builder.appName("correlate_logs").getOrCreate()
     assert spark.version >= "2.4"  # make sure we have Spark 2.4+
     spark.sparkContext.setLogLevel("WARN")
     sc = spark.sparkContext
-    main(inputs, outputs)
+    main(input, output)
