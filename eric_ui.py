@@ -12,14 +12,15 @@ app = dash.Dash(__name__)
 
 # ------------------------------------------------------------------------------
 # Import and clean data (importing csv into pandas)
-path = './popularity_year_result' # use your path
-filenames = glob.glob(path+"/*.csv")
+path = './analysis_data/year_return' # use your path
+filenames = glob.glob(path+"/*.parquet")
 dfs = []
 for filename in filenames:
-    dfs.append(pd.read_csv(filename, sep='|', header=0))
+    #dfs.append(pd.read_csv(filename, sep='|', header=0))
+    dfs.append(pd.read_parquet(filename))
 # Concatenate all data into one DataFrame
 df = pd.concat(dfs, ignore_index=True)
-print(df)
+#print(df)
 # ------------------------------------------------------------------------------
 # App layout
 app.layout = html.Div([
@@ -45,9 +46,9 @@ app.layout = html.Div([
                  options=[
                      {"label": "Popularity", "value": "popularity"},
                      {"label": "Return", "value": "return"},
-                     {"label": "Average Vote Average", "value": "vote_average"}],
+                     {"label": "Vote Average", "value": "vote_average"}],
                  multi=False,
-                 value="popolarity",
+                 value="popularity",
                  clearable=False,
                  style={'width': "50%"}
                  ),
@@ -70,15 +71,15 @@ app.layout = html.Div([
 def update_graph(slct_year, slct_col):
     print(slct_year, slct_col)
 
-    container = "Showing the movie ranking of {} by {}}".format(slct_year, slct_col)
+    container = f"Showing the movie ranking by {slct_col} in {slct_year}"
 
     dff = df.copy()
     #filter col
-    dff = dff[dff["year"] == slct_year].sort_values(by='rank', ascending=False)
+    dff = dff[dff["year"] == slct_year].sort_values(by=slct_col, ascending=False).head(10).sort_values(by=slct_col, ascending=True)
     print("dff", dff)
     #filter rows
     #dff = dff[dff["Affected by"] == "Varroa_mites"]
-    fig = px.bar(data_frame=dff, y='title', x='popularity', orientation='h', title='Top 10 movie by')
+    fig = px.bar(data_frame=dff, y='title', x=slct_col, orientation='h', text=slct_col, template="plotly_dark" )
 
     return container, fig
 
