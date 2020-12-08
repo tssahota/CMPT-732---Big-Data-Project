@@ -49,7 +49,7 @@ def clean_metadata(inputs, output_dir, write_mode):
                                    movie_data['production_countries'],
                                    functions.to_date(movie_data['release_date'], 'MM/dd/yyyy').alias('release_date'),
                                    movie_data['revenue'].cast('long').alias('original_revenue'),
-                                   movie_data['runtime'].cast('int'),
+                                   movie_data['runtime'].cast('int').alias('original_runtime'),
                                    movie_data['spoken_languages'],
                                    movie_data['status'],
                                    movie_data['tagline'],
@@ -60,9 +60,10 @@ def clean_metadata(inputs, output_dir, write_mode):
     
     #Remove records with tmdb_id and movie_id = None
     movie_data = movie_data.where((movie_data['tmdb_id'].isNotNull()) & (movie_data['imdb_id']).isNotNull())
-    #Convert 0 original_budget and original_revenue values to None
+    #Convert 0 original_budget, original_revenue, oriinal_runtime values to None
     movie_data = movie_data.select(movie_data['*'], functions.when(movie_data['original_budget'] != 0, movie_data['original_budget']).alias('budget'), \
-                                                    functions.when(movie_data['original_revenue'] != 0, movie_data['original_revenue']).alias('revenue'))
+                                                    functions.when(movie_data['original_revenue'] != 0, movie_data['original_revenue']).alias('revenue'), \
+                                                    functions.when(movie_data['original_runtime'] != 0, movie_data['original_runtime']).alias('runtime'))
     #Calculate profit
     movie_data = movie_data.withColumn("profit", movie_data['revenue'] - movie_data['budget'])
 
