@@ -4,21 +4,23 @@ from pyspark.sql import SparkSession, types, Window
 from pyspark.sql.functions import rank, col, to_timestamp, year, month, explode
 
 def main():
-    input_dir = "Data_Cleaning/Processed_Data"
+    input_dir = "Processed\ Data"
     output_dir = "analysis_data"
-    movie_data = spark.read.parquet(input_dir+"/movies_aggregated_data.parquet")
+    movie_data = spark.read.parquet(input_dir+"/movies_metadata")
     #movie_data.describe('popularity').show()
     #movie_data.describe('vote_average').show()
     #remove null data slot
-    movie_data.show(1)
-    movie_data.printSchema()
+    #movie_data.show(1)
+    #movie_data.printSchema()
     #movie_data = movie_data.where((movie_data['title'].isNotNull()) & (movie_data['release_date'].isNotNull()) & (movie_data['release_date'].isNotNull()) & (movie_data['popularity'].isNotNull()) & (movie_data['genre_ids'].isNotNull()) & (movie_data['profit'].isNotNull()))
-    movie_data = movie_data.na.drop(subset=["title", "release_date", "popularity", "genre_ids", "budget", "profit"])
+    movie_data = movie_data.na.drop(subset=["title", "popularity", "genre_ids", "budget", "profit"])
     print(movie_data.count())
-    movie_data.show(1)
+    movie_data.show(10)
 
     #create new columns for processing
     movie_data = movie_data.select((movie_data["profit"]/movie_data["budget"]).alias("return") , movie_data["genre_ids"], movie_data["vote_average"], movie_data["title"], movie_data["popularity"], movie_data["release_date"])
+    print(movie_data.count())
+    movie_data.show(11)
     movie_data = movie_data.withColumn('year', year(to_timestamp(movie_data['release_date'], 'yyyy-MM-dd')))
     movie_data = movie_data.withColumn('month', month(to_timestamp(movie_data['release_date'], 'yyyy-MM-dd')))
     movie_data = movie_data.where((movie_data['year'] > 2007) & (movie_data['year'] <= 2017)).drop("release_date")
@@ -40,7 +42,7 @@ def main():
     # year_return_data.write.mode('overwrite').parquet(output_dir + "/year_return")
 
     #genre analysis
-    genre_data = spark.read.parquet(input_dir+"/genre_details.parquet")
+    genre_data = spark.read.parquet(input_dir+"/genre_details")
     genre_data.orderBy(genre_data['genre_id'].desc()).show(50)
     #drop genres that's not in the list since the amount of data is not enough for analysis
     #genres_list = ['Drama', 'Comedy', 'Thriller', 'Romance', 'Action', 'Horror', 'Crime', 'Adventure', 'Science Fiction', 'Mystery', 'Fantasy', 'Animation']
@@ -52,8 +54,17 @@ def main():
     genre_movie_data.show(20)
     #genre_movie_data = genre_movie_data.groupBy('genre_id').count().orderBy('count')
     #genre_movie_data = genre_movie_data.groupBy('genre_id').agg({''})
-    popularity_window = Window.partitionBy(cached_movie_data['year']).orderBy(cached_movie_data['popularity'].desc())
+    genre_pop_window = Window.partitionBy(genre_movie_data['genre_id']).orderBy(genre_movie_data['popularity'].desc())
+    genre_return_window = Window.partitionBy(genre_movie_data['genre_id']).orderBy(genre_movie_data['return'].desc())
+    genre_vote_average_window = Window.partitionBy(genre_movie_data['genre_id']).orderBy(genre_movie_data['vote_average'].desc())
+    genre_pop_data = genre_movie_data.select('*', rank().over(genre_pop_window).alias('poularity_rank'))
+    genre_pop_data = genre_pop_data.select('*', rank().over(genre_return_window).alias('return_rank'))
+    genre_pop_data = genre_pop_data.select('*', rank().over(genre_vote_average_window).alias('vote_average_rank'))
+    genre_pop_data = genre_pop_data.where((col('poularity_rank') <= 10) | (col('vote_average_rank') <= 10) | (col('return_rank') <= 10))
+    genre_pop_data.show(100)
 
+
+    #genre_movie_data.groupBy('genre_id').agg({'return': 'max', 'popularity': 'max', 'vote_average': 'max'}, title).show(10)
 
 if __name__ == '__main__':
     spark = SparkSession.builder.appName("temporal_trend_analysis").getOrCreate()
