@@ -12,8 +12,8 @@ app = dash.Dash(__name__)
 
 # ------------------------------------------------------------------------------
 # Import and clean data (importing csv into pandas)
-path_list = ['./analysis_data/task1', './analysis_data/task3'] # use your path
-task_list = ['task1', 'task3']
+path_list = ['./analysis_data/task1', './analysis_data/task2', './analysis_data/task3'] # use your path
+task_list = ['task1', 'task2', 'task3']
 df = {}
 for i, path in enumerate(path_list):
     filenames = glob.glob(path+"/*.parquet")
@@ -33,7 +33,7 @@ for i in range(18):
     year_list.append({"label": 2000+(17-i), "value": 2000+(17-i)})
 
 col_label = {}
-col_label['vote_average'] = 'Vote Average'
+col_label['vote_average'] = 'Vote Average (Max=10)'
 col_label['avg_user_rating'] = 'Average User Rating (Max=5)'
 col_label['popularity'] = 'Popularity'
 col_label['profit'] = 'Profit'
@@ -48,14 +48,14 @@ col_list = [{"label": col_label["popularity"], "value": "popularity"},
 app.layout = html.Div([
     html.Div(id='task1_container', children=[
         html.H1(id='header_task1', style={'text-align': 'center'}),
-        dcc.Dropdown(id="slct_year",
+        dcc.Dropdown(id="slct_year_task1",
                     options=year_list,
                     multi=False,
                     value=2017,
                     clearable=False,
                     style={'width': "50%"}
                     ),
-        dcc.Dropdown(id="slct_col",
+        dcc.Dropdown(id="slct_col_task1",
                     options=col_list,
                     multi=False,
                     value="popularity",
@@ -64,6 +64,26 @@ app.layout = html.Div([
                     ),
         html.Br(),
         dcc.Graph(id='task1_bar_chart')
+    ]),
+
+    html.Div(id='task2_container', children=[
+        html.H1(id='header_task2', style={'text-align': 'center'}),
+        dcc.Dropdown(id="slct_year_task2",
+                    options=year_list,
+                    multi=False,
+                    value=2017,
+                    clearable=False,
+                    style={'width': "50%"}
+                    ),
+        dcc.Dropdown(id="slct_col_task2",
+                    options=col_list,
+                    multi=False,
+                    value="popularity",
+                    clearable=False,
+                    style={'width': "50%"}
+                    ),
+        html.Br(),
+        dcc.Graph(id='task2_bar_chart')
     ]),
     
     html.Div(id='task3_container', children=[
@@ -92,12 +112,12 @@ app.layout = html.Div([
 @app.callback(
     [Output(component_id='header_task1', component_property='children'),
      Output(component_id='task1_bar_chart', component_property='figure')],
-    [Input(component_id='slct_year', component_property='value'),
-    Input(component_id='slct_col', component_property='value')]
+    [Input(component_id='slct_year_task1', component_property='value'),
+    Input(component_id='slct_col_task1', component_property='value')]
 )
 def update_graph(slct_year, slct_col):
     print('task1 update', slct_year, slct_col)
-    container = f"10 Most {col_label[slct_col]} Movies in {slct_year}"
+    container = f"Top 10 {col_label[slct_col]} Movies in {slct_year}"
     dff = df["task1"].copy()
     #filter col
     dff = dff[dff["year"] == slct_year].sort_values(by=slct_col, ascending=False).head(10).sort_values(by=slct_col, ascending=True)
@@ -105,17 +125,27 @@ def update_graph(slct_year, slct_col):
     #filter rows
     #dff = dff[dff["Affected by"] == "Varroa_mites"]
     #text=slct_col,
-    fig = px.bar(data_frame=dff, y='title', x=slct_col, orientation='h', text=slct_col, template="ggplot2", colors=[
-            "#1b9e77",
-            "#d95f02",
-            "#7570b3",
-            "#e7298a",
-            "#66a61e",
-            "#e6ab02",
-            "#a6761d",
-            "#666666",
-            "#1b9e77",
-        ] )
+    fig = px.bar(data_frame=dff, y='title', x=slct_col, orientation='h', text=slct_col, template="ggplot2", color=slct_col )
+    return container, fig
+
+#***Task2 callback
+@app.callback(
+    [Output(component_id='header_task2', component_property='children'),
+     Output(component_id='task2_bar_chart', component_property='figure')],
+    [Input(component_id='slct_year_task2', component_property='value'),
+    Input(component_id='slct_col_task2', component_property='value')]
+)
+def update_graph(slct_year, slct_col):
+    print('task2 update', slct_year, slct_col)
+    container = f"Top 10 Average {col_label[slct_col]} Genres in {slct_year}"
+    dff = df["task2"].copy()
+    #filter col
+    dff = dff[dff["year"] == slct_year].sort_values(by=slct_col, ascending=False).head(10).sort_values(by=slct_col, ascending=True)
+    #print("task 1 dff", dff)
+    #filter rows
+    #dff = dff[dff["Affected by"] == "Varroa_mites"]
+    #text=slct_col,
+    fig = px.bar(data_frame=dff, y='genre_name', x=slct_col, orientation='h', text=slct_col, template="ggplot2", color=slct_col )
     return container, fig
 
 #***Task3 callback
@@ -127,7 +157,7 @@ def update_graph(slct_year, slct_col):
 )
 def update_graph(slct_genre, slct_col):
     print('task3 update', slct_genre, slct_col)
-    container = f"10 Most {col_label[slct_col]} Movies in {slct_genre} (2000-2017)"
+    container = f"Top 10 {col_label[slct_col]} Movies in {slct_genre} (2000-2017)"
     dff = df["task3"].copy()
     #filter col
     dff = dff[dff["genre_name"] == slct_genre].sort_values(by=slct_col, ascending=False).head(10).sort_values(by=slct_col, ascending=True)

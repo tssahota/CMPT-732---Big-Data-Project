@@ -1,7 +1,7 @@
 import sys
 assert sys.version_info >= (3, 5)  # make sure we have Python 3.5+
 from pyspark.sql import SparkSession, types, Window
-from pyspark.sql.functions import rank, col, to_timestamp, year, month, explode
+from pyspark.sql.functions import rank, col, to_timestamp, year, month, explode, avg
 
 def main():
     input_dir = "Processed_Data"
@@ -50,6 +50,7 @@ def main():
     ex_movie_data = cached_movie_data.select('*', explode(cached_movie_data['genre_ids']).alias('genre_id'))
     ex_movie_data = ex_movie_data.drop('genre_ids', 'month')
     genre_movie_data = ex_movie_data.join(genre_data, 'genre_id')
+    genre_movie_data = genre_movie_data.cache()
     #genre_movie_data.show(20)
     #genre_movie_data = genre_movie_data.groupBy('genre_id').count().orderBy('count')
     #genre_movie_data = genre_movie_data.groupBy('genre_id').agg({''})
@@ -67,6 +68,15 @@ def main():
     #genre_pop_data.write.mode('overwrite').parquet(output_dir + "/task3")
 
     #task2
+    task2 = genre_movie_data.groupBy('year','genre_name').agg(avg(movie_data['profit']).alias('profit'), avg(movie_data['popularity']).alias('popularity'), avg(movie_data['vote_average']).alias('vote_average'), avg(movie_data['avg_user_rating']).alias('avg_user_rating')).orderBy('year')
+    task2.write.mode('overwrite').parquet(output_dir + "/task2")
+
+    # movie_data = spark.read.parquet(input_dir + "/movies_aggregated_data.parquet")
+    # movie_data = movie_data.where(movie_data['profit'] != 0)
+    # movie_data = movie_data.where(year(movie_data['release_date'] == '2017'))
+    # movie_data = movie_data.select(movie_data['tmdb_id'] ,movie_data['profit'], explode(movie_data['genre_id']))
+    # movie_data = movie_data.groupBy('year','genre_id').agg(avg(movie_data['profit']).alias('profit'))
+    # movie_data.show(20)
     #genre_movie_data.show(20)
     #genre_movie_data.groupBy('genre_id', 'year').max('return', 'vote_average', 'popularity').show()
     # window = Window.partitionBy(genre_movie_data['year']).groupBy('genre_id').agg({'popularity': 'max'}).orderBy(genre_movie_data['popularity'].desc())
