@@ -106,7 +106,7 @@ spark-submit ETL_credits.py credits.csv <output_directory> overwrite
 
 
 # eric_analysis.py
-spark-submit eric_analysis.py Processed\ Data/movies_metadata Processed\ Data/genre_details
+spark-submit eric_analysis.py
 
 # eric_ui.py
 python eric_ui.py
