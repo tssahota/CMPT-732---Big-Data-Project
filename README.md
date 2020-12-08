@@ -4,7 +4,6 @@ Movie Data Analysis and Success Pediction
 Raw Datasets
 Contains unprocessed datasets (input files for data cleaning jobs) in .csv format:
 
-
 Processed Data
 Contains cleaned, tranasformed and aggregated data as parquet files.
 
@@ -104,6 +103,13 @@ spark-submit ETL_keywords.py keywords.csv <output_directory> overwrite
 spark-submit ETL_credits.py credits.csv <output_directory> overwrite
 
 
+
+
+# eric_analysis.py
+spark-submit eric_analysis.py Processed\ Data/movies_metadata Processed\ Data/genre_details
+
+# eric_ui.py
+python eric_ui.py
 
 # UI
 pip install pandas
