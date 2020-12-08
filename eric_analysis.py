@@ -41,6 +41,10 @@ def main():
     # year_profit_data.show(10)
     # year_profit_data.write.mode('overwrite').parquet(output_dir + "/task1")
 
+    #***task2
+    task2 = genre_movie_data.groupBy('year','genre_name').agg(avg(movie_data['profit']).alias('profit'), avg(movie_data['popularity']).alias('popularity'), avg(movie_data['vote_average']).alias('vote_average'), avg(movie_data['avg_user_rating']).alias('avg_user_rating')).orderBy('year')
+    #task2.write.mode('overwrite').parquet(output_dir + "/task2")
+
     #***genre analysis task3
     genre_data = spark.read.parquet(input_dir+"/genre_details.parquet")
     #genre_data.orderBy(genre_data['genre_id'].desc()).show(50)
@@ -67,9 +71,6 @@ def main():
     #genre_pop_data.show(100)
     #genre_pop_data.write.mode('overwrite').parquet(output_dir + "/task3")
 
-    #task2
-    task2 = genre_movie_data.groupBy('year','genre_name').agg(avg(movie_data['profit']).alias('profit'), avg(movie_data['popularity']).alias('popularity'), avg(movie_data['vote_average']).alias('vote_average'), avg(movie_data['avg_user_rating']).alias('avg_user_rating')).orderBy('year')
-    task2.write.mode('overwrite').parquet(output_dir + "/task2")
 
     # movie_data = spark.read.parquet(input_dir + "/movies_aggregated_data.parquet")
     # movie_data = movie_data.where(movie_data['profit'] != 0)
