@@ -20,17 +20,9 @@ def main(movie_path, genre_path):
     movie_data = movie_data.where((movie_data['year'] > 2007) & (movie_data['year'] <= 2017)).drop("release_date", "genre_ids")
     movie_data.show(100)
     movie_data.write.mode('overwrite').parquet(output_dir + "/year_return")
-    #movie_data.write.csv('anaysis_data', sep='|', header=True)
-    #movie_data.write.partitionBy('year').orderBy('popularity').json("./result", mode="overwrite")
-    #movie_data.orderBy('year', 'popularity', ascending=False).show(100)
-    #sorted_movie_data.show(10)
     #use window to sort and select
     #window = Window.partitionBy(sorted_movie_data['year']).orderBy(sorted_movie_data['popularity'].desc())
     #popularity_year_result = sorted_movie_data.select('*', rank().over(window).alias('rank')).filter(col('rank') <= 10).orderBy(col('year'), col('rank'))
-    #popularity_year_result.show(100)
-    #popularity_year_result.write.csv('popularity_year_result', sep='|', header=True)     
-    #sorted_popularity = movie_data.sort('popularity', ascending=False)
-    #sorted_popularity.select(sorted_popularity['title'], sorted_popularity['tagline'], sorted_popularity['popularity']).show(10)
 
 if __name__ == '__main__':
     movie_path = sys.argv[1]
