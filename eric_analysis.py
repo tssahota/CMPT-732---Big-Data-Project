@@ -13,16 +13,22 @@ def main(movie_path, genre_path):
     # print(movie_data.where(movie_data["popularity"].isNull()).count())
     # print(movie_data.where(movie_data["release_date"].isNull()).count())
     # print(movie_data.where(movie_data["title"].isNull()).count())
-    movie_data = movie_data.na.drop(subset=["title", "release_date", "popularity", "genre_ids", "budget", "revenue"])
-    movie_data = movie_data.select( (movie_data["revenue"]/movie_data["budget"]).alias("return") , movie_data["genre_ids"], movie_data["vote_average"], movie_data["title"], movie_data["popularity"], movie_data["release_date"])
+    movie_data = movie_data.na.drop(subset=["title", "release_date", "popularity", "genre_ids", "budget", "profit"])
+    movie_data = movie_data.select( (movie_data["profit"]/movie_data["budget"]).alias("return") , movie_data["genre_ids"], movie_data["vote_average"], movie_data["title"], movie_data["popularity"], movie_data["release_date"])
     genre_data.orderBy(genre_data['genre_id'].desc()).show(50)
     movie_data = movie_data.withColumn('year', year(to_timestamp(movie_data['release_date'], 'yyyy-MM-dd')))
     movie_data = movie_data.where((movie_data['year'] > 2007) & (movie_data['year'] <= 2017)).drop("release_date", "genre_ids")
+    #use window to sort and select
+    popularity_window = Window.partitionBy(movie_data['year']).orderBy(movie_data['popularity'].desc())
+    vote_average_window = Window.partitionBy(movie_data['year']).orderBy(movie_data['vote_average'].desc())
+    return_window = Window.partitionBy(movie_data['year']).orderBy(movie_data['return'].desc())
+    movie_data = movie_data.select('*', rank().over(popularity_window).alias('poularity_rank'))
+    movie_data = movie_data.select('*', rank().over(vote_average_window).alias('vote_average_rank'))
+    movie_data = movie_data.select('*', rank().over(return_window).alias('return_rank'))
+    movie_data = movie_data.where((col('poularity_rank') <= 10) | (col('vote_average_rank') <= 10) | (col('return_rank') <= 10))
+    print(movie_data.count())
     movie_data.show(100)
     movie_data.write.mode('overwrite').parquet(output_dir + "/year_return")
-    #use window to sort and select
-    #window = Window.partitionBy(sorted_movie_data['year']).orderBy(sorted_movie_data['popularity'].desc())
-    #popularity_year_result = sorted_movie_data.select('*', rank().over(window).alias('rank')).filter(col('rank') <= 10).orderBy(col('year'), col('rank'))
 
 if __name__ == '__main__':
     movie_path = sys.argv[1]

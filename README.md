@@ -104,3 +104,8 @@ spark-submit ETL_keywords.py keywords.csv <output_directory> overwrite
 spark-submit ETL_credits.py credits.csv <output_directory> overwrite
 
 
+
+# UI
+pip install pandas
+pip install dash
+pip install pyarrow
