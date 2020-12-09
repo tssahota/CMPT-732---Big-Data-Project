@@ -33,7 +33,7 @@ sidebar = html.Div(
             [
                 dbc.NavLink("Top 10", href="/page-1", id="page-1-link"),
                 dbc.NavLink("Predictor", href="/page-2", id="page-2-link"),
-                dbc.NavLink("Page 3", href="/page-3", id="page-3-link"),
+                dbc.NavLink("language, collection, production country", href="/page-3", id="page-3-link"),
             ],
             vertical=True,
             pills=True,
@@ -56,7 +56,7 @@ app.layout = html.Div([dcc.Location(id="url"), sidebar, content])
 def toggle_active_links(pathname):
     if pathname == "/":
         # Treat page 1 as the homepage / index
-        return False, True, False
+        return True, False, False
     return [pathname == f"/page-{i}" for i in range(1, 4)]
 
 

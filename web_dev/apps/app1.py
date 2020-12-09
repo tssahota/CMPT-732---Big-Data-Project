@@ -1,6 +1,6 @@
 import pandas as pd
 import plotly.express as px
-import plotly.graph_objects as go
+#import plotly.graph_objects as go
 import dash
 import dash_core_components as dcc
 import dash_html_components as html
@@ -51,12 +51,14 @@ layout = html.Div([
         html.H2(id='header_task1', style={'text-align': 'center'}),
         html.Div(id='task1_sub', children=[
             html.Div(id='task1_choice', children=[
+                html.Label('Year:'),
                 dcc.Dropdown(id="slct_year_task1",
                             options=year_label_list,
                             multi=False,
                             value=2017,
                             clearable=False,
                             ),
+                html.Label('Parameter:'),
                 dcc.Dropdown(id="slct_col_task1",
                             options=col_list,
                             multi=False,
@@ -81,12 +83,14 @@ layout = html.Div([
         html.H2(id='header_task2', style={'text-align': 'center'}),
         html.Div(id='task2_sub', children=[
             html.Div(id='task2_choice', children=[
+                html.Label('Year:'),
                 dcc.Dropdown(id="slct_year_task2",
                             options=year_label_list,
                             multi=False,
                             value=2017,
                             clearable=False,
                             ),
+                html.Label('Parameter:'),
                 dcc.Dropdown(id="slct_col_task2",
                             options=col_list,
                             multi=False,
@@ -111,12 +115,14 @@ layout = html.Div([
         html.H2(id='header_task3', style={'text-align': 'center'}),
         html.Div(id='task2_sub', children=[
             html.Div(id='task2_choice', children=[
+                html.Label('Genre:'),
                 dcc.Dropdown(id="slct_genre_task3",
                     options=genre_list,
                     multi=False,
                     value='Adventure',
                     clearable=False
                 ),
+                html.Label('Parameter:'),
                 dcc.Dropdown(id="slct_col_task3",
                     options=col_list,
                     multi=False,
@@ -141,6 +147,7 @@ layout = html.Div([
         html.H2(id='header_task4', style={'text-align': 'center'}),
         html.Div(id='task4_sub', children=[
             html.Div(id='task4_choice', children=[
+            html.Label('Parameter:'),
             dcc.Dropdown(id="slct_col_task4",
                 options=col_list,
                 multi=False,
@@ -183,6 +190,11 @@ def update_graph(slct_year, slct_col):
     #dff = dff[dff["Affected by"] == "Varroa_mites"]
     #text=slct_col,
     fig = px.bar(data_frame=dff, y='title', x=slct_col, orientation='h', text=slct_col, template="ggplot2", color=slct_col )
+    fig.update_layout(
+        #title="Plot Title",
+        xaxis_title=col_label[slct_col],
+        yaxis_title='Title',
+    )
     return container, fig
 
 #***Task2 callback***
@@ -203,6 +215,11 @@ def update_graph(slct_year, slct_col):
     #dff = dff[dff["Affected by"] == "Varroa_mites"]
     #text=slct_col,
     fig = px.bar(data_frame=dff, y='genre_name', x=slct_col, orientation='h', text=slct_col, template="ggplot2", color=slct_col )
+    fig.update_layout(
+        #title="Plot Title",
+        xaxis_title=col_label[slct_col],
+        yaxis_title='Genre',
+    )
     return container, fig
 
 #***Task3 callback***
@@ -220,6 +237,11 @@ def update_graph(slct_genre, slct_col):
     dff = dff[dff["genre_name"] == slct_genre].sort_values(by=slct_col, ascending=False).head(10).sort_values(by=slct_col, ascending=True)
     #print("task3_dff", dff)
     fig = px.bar(data_frame=dff, y='title', x=slct_col, orientation='h', text=slct_col, template="ggplot2", color=slct_col)
+    fig.update_layout(
+        #title="Plot Title",
+        xaxis_title=col_label[slct_col],
+        yaxis_title='Title',
+    )
     return container, fig
 
 #***Task4 callback***
@@ -232,9 +254,13 @@ def update_graph(slct_col):
     print('task4 update')
     container = f"Top 10 {col_label[slct_col]} Production Companies of all-time"
     dff = df["task4"].copy()
-    print(dff)
     #filter col
     dff = dff.sort_values(by=slct_col, ascending=False).head(10).sort_values(by=slct_col, ascending=True)
     #print("task4_dff", dff)
     fig = px.bar(data_frame=dff, y='production_company', x=slct_col, orientation='h', text=slct_col, template="ggplot2", color=slct_col)
+    fig.update_layout(
+        #title="Plot Title",
+        xaxis_title=col_label[slct_col],
+        yaxis_title='Production Company',
+    )
     return container, fig
