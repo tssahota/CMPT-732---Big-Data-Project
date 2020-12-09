@@ -1,7 +1,7 @@
 import sys
 assert sys.version_info >= (3, 5)  # make sure we have Python 3.5+
 from pyspark.sql import SparkSession, types, Window
-from pyspark.sql.functions import rank, col, to_timestamp, year, month, explode, avg
+from pyspark.sql.functions import rank, col, to_timestamp, year, month, explode, broadcast, avg
 
 def main():
     input_dir = "../Processed_Data"
@@ -29,6 +29,10 @@ def main():
     #genres_list = ['Drama', 'Comedy', 'Thriller', 'Romance', 'Action', 'Horror', 'Crime', 'Adventure', 'Science Fiction', 'Mystery', 'Fantasy', 'Animation']
     #genre_df = genre_df.where(genre_df['genre_name'].isin(genres_list))
 
+    #******Read production company detail data******
+    company_df = spark.read.parquet(input_dir+"/company_details.parquet")
+    #company_df.show(10)
+
     #******task1 10 Most popular/highest return/highest avg user-rated/highest vote average movies each year (2000-2017)******
     task1_df = cached_movie_df.select("title", 'profit', "vote_average", "popularity", 'avg_user_rating', "year")
     task1_df = task1_df.where((task1_df['year'] >= 2000) & (task1_df['year'] <= 2017))
@@ -54,7 +58,7 @@ def main():
     #******create genre x movie data ******
     ex_movie_df = cached_movie_df.select('*', explode(cached_movie_df['genre_ids']).alias('genre_id'))
     ex_movie_df = ex_movie_df.drop('genre_ids', 'month')
-    genre_movie_df = ex_movie_df.join(genre_df, 'genre_id')
+    genre_movie_df = ex_movie_df.join(broadcast(genre_df), 'genre_id')
     genre_movie_df = genre_movie_df.cache()
 
     #***task2 10 Most popular/highest return/highest avg rated/highest vote average genre each year (2000-2017)******
@@ -65,7 +69,7 @@ def main():
     # task2_df.show(10)
     #task2_df.write.mode('overwrite').parquet(output_dir + "/task2")
 
-    #***genre analysis task3 10 Most popular/highest return/highest avg rated/highest vote average movie in each genre (2000-2017)******
+    #******genre analysis task3 10 Most popular/highest return/highest avg rated/highest vote average movie in each genre (2000-2017)******
     #genre_movie_df.show(20)
     task3_df = genre_movie_df.select("year", 'genre_name', 'title', 'profit', "vote_average", "popularity", 'avg_user_rating')
     task3_df = task3_df.where((task3_df['year'] >= 2000) & (task3_df['year'] <= 2017))
@@ -83,6 +87,14 @@ def main():
     # print('task3 result')
     # task3_df.show(10)
     #task3_df.write.mode('overwrite').parquet(output_dir + "/task3")
+    
+    #******task4 Top 10 Prod companies with movies that are Most(or avg?) popular/highest avg profit/highest avg rated/highest vote average (all-time)******
+    task4_df = cached_movie_df.select('title', 'profit', "vote_average", "popularity", 'avg_user_rating', 'production_company_ids')
+    task4_df = task4_df.select('*', explode(task4_df['production_company_ids']).alias('company_id')).drop('production_company_ids')
+    task4_df = task4_df.join(broadcast(company_df), 'company_id')
+    task4_df = task4_df.groupBy('production_company').agg(avg(col('profit')).alias('profit'), avg(col('popularity')).alias('popularity'), avg(col('vote_average')).alias('vote_average'), avg(col('avg_user_rating')).alias('avg_user_rating'))
+    #task4_df.show(20)
+    #task4_df.write.mode('overwrite').parquet(output_dir + "/task4")
 
 if __name__ == '__main__':
     spark = SparkSession.builder.appName("task1-3").getOrCreate()
