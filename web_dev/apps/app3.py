@@ -5,5 +5,7 @@ from dash.dependencies import Input, Output
 from app import app
 
 layout = html.Div([
-    html.H3('App 3'),
+    html.H3('App 3')
 ])
+
+

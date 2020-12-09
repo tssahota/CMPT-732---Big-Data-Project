@@ -3,7 +3,7 @@ import dash_bootstrap_components as dbc
 import dash_core_components as dcc
 import dash_html_components as html
 from dash.dependencies import Input, Output
-from apps import app1, app2
+from apps import app1, app2, app3
 from app import app
 
 # the style arguments for the sidebar. We use position:fixed and a fixed width
@@ -20,7 +20,7 @@ SIDEBAR_STYLE = {
 # the styles for the main content position it to the right of the sidebar and
 # add some padding.
 CONTENT_STYLE = {
-    "margin-left": "18rem",
+    "margin-left": "12rem",
     "margin-right": "2rem",
     "padding": "2rem 1rem",
 }
@@ -31,7 +31,7 @@ sidebar = html.Div(
         #html.Hr(),
         dbc.Nav(
             [
-                dbc.NavLink("Top10", href="/page-1", id="page-1-link"),
+                dbc.NavLink("Top 10", href="/page-1", id="page-1-link"),
                 dbc.NavLink("Page 2", href="/page-2", id="page-2-link"),
                 dbc.NavLink("Page 3", href="/page-3", id="page-3-link"),
             ],
