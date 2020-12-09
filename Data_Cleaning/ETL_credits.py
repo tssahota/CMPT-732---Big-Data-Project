@@ -87,6 +87,10 @@ def process_credits(inputs,output_dir, write_mode):
                                        crew_details['crew_df'].getField('job').alias('crew_job'), \
                                        crew_details['crew_df'].getField('profile_path').alias('crew_profile_path')).distinct()
 
+    #modification for predictor
+    cast_details = cast_details.withColumn("cast_power", functions.lit(None).cast('int'))
+    crew_details = crew_details.withColumn("crew_power", functions.lit(None).cast('int'))
+
     #always overwrite aggregated_movie data
     movies_agg_data_new.write.mode('overwrite').parquet(output_dir + "/movies_aggregated_data.parquet")
        

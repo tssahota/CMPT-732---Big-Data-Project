@@ -151,12 +151,8 @@ def clean_metadata(inputs, output_dir, write_mode):
 
 def main(inputs, output):
     
-    output_dir = output[0]
-    write_mode = "append" #default writemode is append
-    #check if write_mode is also mentioned in command line:
-    if len(output) > 1:
-      write_mode = output[1] 
-    clean_metadata(inputs,output_dir,write_mode)
+    data = spark.read.parquet(output_directory + "/movies_aggregated_data.parquet")
+    
 
 if __name__ == '__main__':
     inputs = sys.argv[1]

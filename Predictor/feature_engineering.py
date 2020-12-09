@@ -85,13 +85,8 @@ def main(inputs, output):
 
 
     #write files
-    cast = cast.join(cast_power, cast['cast_id']==cast_power['cast_split'], 'left').select(cast['*'], cast_power['cast_power'])
-    cast.write.mode('overwrite').parquet(input_dir + "/cast_details.parquet") 
-    crew = crew.join(director_power, [crew['crew_id']==director_power['director_split'], crew['crew_job'] == 'Director'], 'left').select(crew['*'], director_power['director_power'].alias('crew_power'))
-    crew = crew.join(producer_power, [crew['crew_id']==producer_power['producer_split'], crew['crew_job'] == 'Producer'], 'left').select(crew['*'], producer_power['producer_power']) 
-    crew = crew.withColumn("crew_power_new", functions.when(crew['crew_power'].isNotNull(), crew['crew_power']).otherwise(crew['producer_power'])) \
-              .drop('crew_power','producer_power').withColumnRenamed("crew_power_new", "crew_power") 
-    crew.write.mode('overwrite').parquet(input_dir + "/crew_details.parquet") 
+    cast.write.mode('overwrite').parquet(input_dir + "/cast_power.parquet") 
+    crew.write.mode('overwrite').parquet(input_dir + "/crew_power.parquet") 
 
     #cast.where(cast['cast_power'].isNotNull()).show(3)
     #crew.where(crew['crew_power'].isNotNull()).show(3)
