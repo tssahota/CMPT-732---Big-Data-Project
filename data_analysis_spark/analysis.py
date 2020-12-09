@@ -1,7 +1,7 @@
 import sys
 assert sys.version_info >= (3, 5)  # make sure we have Python 3.5+
 from pyspark.sql import SparkSession, types, Window
-from pyspark.sql.functions import rank, col, to_timestamp, year, month, explode, broadcast, avg
+from pyspark.sql.functions import rank, col, to_timestamp, year, month, explode, broadcast, avg, count, sum
 
 def main():
     input_dir = "../Processed_Data"
@@ -32,6 +32,10 @@ def main():
     #******Read production company detail data******
     company_df = spark.read.parquet(input_dir+"/company_details.parquet")
     #company_df.show(10)
+
+    #******Read collection detail data******
+    collection_df = spark.read.parquet(input_dir+"/collection_details.parquet").select(col('collection_ids').alias('collection_id'), 'collection_name')
+    #collection_df.show(10)
 
     #******task1 10 Most popular/highest return/highest avg user-rated/highest vote average movies each year (2000-2017)******
     task1_df = cached_movie_df.select("title", 'profit', "vote_average", "popularity", 'avg_user_rating', "year")
@@ -87,14 +91,37 @@ def main():
     # print('task3 result')
     # task3_df.show(10)
     #task3_df.write.mode('overwrite').parquet(output_dir + "/task3")
-    
+
     #******task4 Top 10 Prod companies with movies that are Most(or avg?) popular/highest avg profit/highest avg rated/highest vote average (all-time)******
-    task4_df = cached_movie_df.select('title', 'profit', "vote_average", "popularity", 'avg_user_rating', 'production_company_ids')
+    task4_df = cached_movie_df.select('profit', "vote_average", "popularity", 'avg_user_rating', 'production_company_ids')
     task4_df = task4_df.select('*', explode(task4_df['production_company_ids']).alias('company_id')).drop('production_company_ids')
     task4_df = task4_df.join(broadcast(company_df), 'company_id')
-    task4_df = task4_df.groupBy('production_company').agg(avg(col('profit')).alias('profit'), avg(col('popularity')).alias('popularity'), avg(col('vote_average')).alias('vote_average'), avg(col('avg_user_rating')).alias('avg_user_rating'))
+    task4_df = task4_df.groupBy('production_company').agg(count(col('profit')).alias('count'), avg(col('profit')).alias('profit'), avg(col('popularity')).alias('popularity'), avg(col('vote_average')).alias('vote_average'), avg(col('avg_user_rating')).alias('avg_user_rating'))
+    task4_df = task4_df.where(task4_df['count'] > 15).drop('count')
+    #print(task4_df.count())
     #task4_df.show(20)
     #task4_df.write.mode('overwrite').parquet(output_dir + "/task4")
+
+    #******task8 Original languages other than english which have highest avg popularity, max total revenue, highest average ratings******
+    task8_df = cached_movie_df.select('profit', "vote_average", "popularity", 'avg_user_rating', 'language_id')
+    task8_df = task8_df.select('*', explode(task8_df['language_id']).alias('language')).drop('language_id')
+    task8_df = task8_df.groupBy('language').agg(count(col('profit')).alias('count'), avg(col('profit')).alias('profit'), avg(col('popularity')).alias('popularity'), avg(col('vote_average')).alias('vote_average'), avg(col('avg_user_rating')).alias('avg_user_rating'))
+    task8_df = task8_df.where(task8_df['count'] > 50).drop('count')
+    #print(task8_df.count())
+    #task8_df.show(20)
+    #task8_df.write.mode('overwrite').parquet(output_dir + "/task8")
+
+    #******task11 Collection with movies of highest avg popularity, highest return, highest avg return and highest avg rating******
+    task11_df = cached_movie_df.select('profit', "vote_average", "popularity", 'avg_user_rating', 'collection_ids')
+    task11_df = task11_df.select('*', explode(task11_df['collection_ids']).alias('collection_id')).drop('collection_ids')
+    #No big difference in join
+    task11_df = task11_df.join(collection_df, 'collection_id')
+    task11_df = task11_df.groupBy('collection_name').agg(count(col('profit')).alias('count'), avg(col('profit')).alias('profit'), avg(col('popularity')).alias('popularity'), avg(col('vote_average')).alias('vote_average'), avg(col('avg_user_rating')).alias('avg_user_rating'))
+    task11_df = task11_df.where(task11_df['count'] > 1).drop('count')
+    #print(task11_df.count())
+    task11_df.show(20)
+    #task11_df.write.mode('overwrite').parquet(output_dir + "/task11")
+
 
 if __name__ == '__main__':
     spark = SparkSession.builder.appName("task1-3").getOrCreate()
