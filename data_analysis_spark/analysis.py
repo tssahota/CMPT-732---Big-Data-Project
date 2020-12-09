@@ -106,7 +106,7 @@ def main():
     task8_df = cached_movie_df.select('profit', "vote_average", "popularity", 'avg_user_rating', 'language_id')
     task8_df = task8_df.select('*', explode(task8_df['language_id']).alias('language')).drop('language_id')
     task8_df = task8_df.groupBy('language').agg(count(col('profit')).alias('count'), avg(col('profit')).alias('profit'), avg(col('popularity')).alias('popularity'), avg(col('vote_average')).alias('vote_average'), avg(col('avg_user_rating')).alias('avg_user_rating'))
-    task8_df = task8_df.where(task8_df['count'] > 50).drop('count')
+    task8_df = task8_df.where(task8_df['count'] > 50)
     #print(task8_df.count())
     #task8_df.show(20)
     #task8_df.write.mode('overwrite').parquet(output_dir + "/task8")
@@ -117,9 +117,20 @@ def main():
     #No big difference in join
     task11_df = task11_df.join(collection_df, 'collection_id')
     task11_df = task11_df.groupBy('collection_name').agg(count(col('profit')).alias('count'), avg(col('profit')).alias('profit'), avg(col('popularity')).alias('popularity'), avg(col('vote_average')).alias('vote_average'), avg(col('avg_user_rating')).alias('avg_user_rating'))
-    task11_df = task11_df.where(task11_df['count'] > 1).drop('count')
+    task11_df = task11_df.where(task11_df['count'] > 1)
     #print(task11_df.count())
-    task11_df.show(20)
+    #task11_df.show(20)
+    #task11_df.write.mode('overwrite').parquet(output_dir + "/task11")
+
+    #******task11 Collection with movies of highest avg popularity, highest return, highest avg return and highest avg rating******
+    task11_df = cached_movie_df.select('profit', "vote_average", "popularity", 'avg_user_rating', 'collection_ids')
+    task11_df = task11_df.select('*', explode(task11_df['collection_ids']).alias('collection_id')).drop('collection_ids')
+    #No big difference in join
+    task11_df = task11_df.join(collection_df, 'collection_id')
+    task11_df = task11_df.groupBy('collection_name').agg(count(col('profit')).alias('count'), avg(col('profit')).alias('profit'), avg(col('popularity')).alias('popularity'), avg(col('vote_average')).alias('vote_average'), avg(col('avg_user_rating')).alias('avg_user_rating'))
+    task11_df = task11_df.where(task11_df['count'] > 1)
+    #print(task11_df.count())
+    #task11_df.show(20)
     #task11_df.write.mode('overwrite').parquet(output_dir + "/task11")
 
 
