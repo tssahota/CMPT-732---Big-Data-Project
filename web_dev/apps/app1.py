@@ -136,14 +136,7 @@ layout = html.Div([
         ], className="row"),
         dcc.Graph(id='task3_bar_chart')
     ]),
-
-#   dcc.Dropdown(id="slct_col_task4",
-#             options=col_list,
-#             multi=False,
-#             value="popularity",
-#             clearable=False,
-#             style={'width': "50%"}
-#         ),
+    
     html.Div(id='task4_container', children=[
         html.H2(id='header_task4', style={'text-align': 'center'}),
         html.Div(id='task4_sub', children=[
