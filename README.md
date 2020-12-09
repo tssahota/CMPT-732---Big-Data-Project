@@ -102,7 +102,9 @@ spark-submit ETL_keywords.py keywords.csv <output_directory> overwrite
 5. ETL_credits.py
 spark-submit ETL_credits.py credits.csv <output_directory> overwrite
 
-
+Prediction:
+feature_engineering.py
+/spark-submit feature_engineering.py <processed_data_directory> <training_data_directory>
 
 
 # eric_analysis.py
