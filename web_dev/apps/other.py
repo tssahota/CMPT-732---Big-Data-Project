@@ -5,11 +5,18 @@ import dash_core_components as dcc
 import dash_html_components as html
 from dash.dependencies import Input, Output
 import glob
+from iso3166 import countries
 
 from app import app
 
-path_list = ['./apps/analysis_data/task8', './apps/analysis_data/task11'] # use your path
-task_list = ['task8', 'task11']
+colorscale = ["#deebf7", "#d2e3f3", "#c6dbef", "#b3d2e9", "#9ecae1",
+    "#85bcdb", "#6baed6", "#57a0ce", "#4292c6", "#3082be", "#2171b5", "#1361a9",
+    "#08519c", "#0b4083", "#08306b"
+]
+
+
+path_list = ['./apps/analysis_data/task8', './apps/analysis_data/task11', './apps/analysis_data/task10'] # use your path
+task_list = ['task8', 'task11', 'task10']
 df = {}
 
 for i, path in enumerate(path_list):
@@ -32,7 +39,23 @@ col_list = [{"label": col_label["popularity"], "value": "popularity"},
             {"label": col_label['vote_average'], "value": "vote_average"},
             {"label": col_label['avg_user_rating'], "value": "avg_user_rating"}]
 
-print(df)
+#******task10 ******
+task10_df = df['task10'].copy()
+# print (countries.get(task10_df['country_id'][0])[2])
+def change_iso_alpha(x):
+    try: 
+        return countries.get(x)[2]
+    except:
+        return None
+#task10_df
+task10_df['iso_alpha'] = task10_df['country_id'].apply(change_iso_alpha)
+print(task10_df)
+task10_fig = px.choropleth(task10_df, locations="iso_alpha",
+                    color="count",
+                    hover_name="country", # column to add to hover information
+                    hover_data=["country_id", "count"],
+                    template="plotly_white", color_continuous_scale=colorscale)
+
 layout = html.Div([
     html.Div(id='task8_container', children=[
         html.H2(id='header_task8', style={'text-align': 'center'}),
@@ -98,6 +121,19 @@ layout = html.Div([
         dcc.Graph(id='task11_bubble_chart')
     ]),
 
+    html.Div(id='task10_container', children=[
+        html.H2(id='header_task10', style={'text-align': 'center'},children='Most popular production countries' ),
+            html.P(
+                id="description",
+                children="† Deaths are classified using the International Classification of Diseases, \
+                Tenth Revision (ICD–10). Drug-poisoning deaths are defined as having ICD–10 underlying \
+                cause-of-death codes X40–X44 (unintentional), X60–X64 (suicide), X85 (homicide), or Y10–Y14 \
+                (undetermined intent).***count of collection is the size of bubble here.***",
+                style={'text-align': 'center'}
+            ),
+        dcc.Graph(id='task10_map_chart', figure=task10_fig)
+    ]),
+
 ])
 
 #******task8 ******
@@ -116,7 +152,7 @@ def update_graph(slct_colx, slct_coly):
 	    size="count", color="count",
         hover_name="language", log_x=True,
         text="language",
-        size_max=60, template="ggplot2",
+        size_max=60, template="plotly_white", color_continuous_scale=colorscale,
     )
     fig.update_layout(
         #title="Plot Title",
@@ -140,7 +176,7 @@ def update_graph(slct_colx, slct_coly):
     fig = px.scatter(dff, x=slct_colx, y=slct_coly,
 	    size="count", color="count",
         hover_name="collection_name", log_x=True,
-        size_max=60, template="ggplot2",
+        size_max=60, template="plotly_white", color_continuous_scale=colorscale
     )
     fig.update_layout(
         #title="Plot Title",
@@ -148,3 +184,4 @@ def update_graph(slct_colx, slct_coly):
         yaxis_title=col_label[slct_coly],
     )
     return container, fig
+

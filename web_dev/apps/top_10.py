@@ -8,7 +8,10 @@ from dash.dependencies import Input, Output
 import glob
 
 from app import app
-
+colorscale = [ "#c6dbef", "#b3d2e9", "#9ecae1",
+    "#85bcdb", "#6baed6", "#57a0ce", "#4292c6", "#3082be", "#2171b5", "#1361a9",
+    "#08519c", "#0b4083", "#08306b"
+]
 # ------------------------------------------------------------------------------
 # Import and clean data (importing csv into pandas)
 path_list = ['./apps/analysis_data/task1', './apps/analysis_data/task2', './apps/analysis_data/task3', './apps/analysis_data/task4'] # use your path
@@ -156,7 +159,7 @@ def update_graph(slct_year, slct_col):
     #filter rows
     #dff = dff[dff["Affected by"] == "Varroa_mites"]
     #text=slct_col,
-    fig = px.bar(data_frame=dff, y='title', x=slct_col, orientation='h', text=slct_col, template="ggplot2", color=slct_col )
+    fig = px.bar(data_frame=dff, y='title', x=slct_col, orientation='h', text=slct_col, template="plotly_white", color_continuous_scale=colorscale, color=slct_col )
     fig.update_layout(
         #title="Plot Title",
         xaxis_title=col_label[slct_col],
@@ -178,7 +181,7 @@ def update_graph(slct_genre, slct_col):
     #filter col
     dff = dff[dff["genre_name"] == slct_genre].sort_values(by=slct_col, ascending=False).head(10).sort_values(by=slct_col, ascending=True)
     #print("task3_dff", dff)
-    fig = px.bar(data_frame=dff, y='title', x=slct_col, orientation='h', text=slct_col, template="ggplot2", color=slct_col)
+    fig = px.bar(data_frame=dff, y='title', x=slct_col, orientation='h', text=slct_col, template="plotly_white", color_continuous_scale=colorscale, color=slct_col)
     fig.update_layout(
         #title="Plot Title",
         xaxis_title=col_label[slct_col],
@@ -199,7 +202,7 @@ def update_graph(slct_col):
     #filter col
     dff = dff.sort_values(by=slct_col, ascending=False).head(10).sort_values(by=slct_col, ascending=True)
     #print("task4_dff", dff)
-    fig = px.bar(data_frame=dff, y='production_company', x=slct_col, orientation='h', text=slct_col, template="ggplot2", color=slct_col)
+    fig = px.bar(data_frame=dff, y='production_company', x=slct_col, orientation='h', text=slct_col, template="plotly_white", color_continuous_scale=colorscale, color=slct_col)
     fig.update_layout(
         #title="Plot Title",
         xaxis_title=col_label[slct_col],

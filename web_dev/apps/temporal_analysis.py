@@ -65,18 +65,16 @@ layout = html.Div([
 )
 def update_graph(slct_col):
     print('task2 update', slct_col)
-    container = f"Top Average {col_label[slct_col]} Genres"
+    container = f"Top Average {col_label[slct_col]} Genre by year"
     dff = df["task2"].copy()
+    #print(dff.groupby(['year']).max())
     #filter col
-    dff = dff.sort_values(by=slct_col, ascending=False).head(10).sort_values(by=slct_col, ascending=True)
-    #print("task 1 dff", dff)
-    #filter rows
-    #dff = dff[dff["Affected by"] == "Varroa_mites"]
-    #text=slct_col,
-    fig = px.bar(data_frame=dff, y='genre_name', x=slct_col, orientation='v', text=slct_col, template="ggplot2", color=slct_col)
+    dff = dff.groupby(['year']).max()
+    #print(dff)
+    fig = px.bar(data_frame=dff, y=slct_col, x=dff.index, orientation='v', text='genre_name', template="ggplot2")
     fig.update_layout(
         #title="Plot Title",
-        xaxis_title=col_label[slct_col],
-        yaxis_title='Genre',
+        xaxis_title='Year',
+        yaxis_title=col_label[slct_col],
     )
     return container, fig
