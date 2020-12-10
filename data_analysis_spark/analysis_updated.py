@@ -1,7 +1,7 @@
 import sys
 assert sys.version_info >= (3, 5)  # make sure we have Python 3.5+
 from pyspark.sql import SparkSession, types, Window
-from pyspark.sql.functions import rank, col, to_timestamp, year, month, explode, broadcast, avg, count, sum, lit, when
+from pyspark.sql.functions import rank, col, to_timestamp, year, month, explode, broadcast, avg, count, sum, lit, when, max
 from pyspark.sql import functions
 
 def main():
@@ -65,6 +65,10 @@ def main():
     #******Read collection detail data******
     collection_df = spark.read.parquet(input_dir+"/collection_details.parquet").select(col('collection_ids').alias('collection_id'), 'collection_name')
     #collection_df.show(10)
+
+    #******Read country detail data******
+    country_df = spark.read.parquet(input_dir+"/country_details.parquet")
+    #country_df.show(10)
     
     #******Read keyword detail data******
     keyword_df = spark.read.parquet(input_dir+"/keyword_details.parquet")
@@ -80,13 +84,13 @@ def main():
     avg_user_rating_window = Window.partitionBy('year').orderBy(col('avg_user_rating').desc())
 
     #call window and create new ranking columns
-    task1_df = task1_df.select('*', rank().over(popularity_window).alias('poularity_rank'))
+    task1_df = task1_df.select('*', rank().over(popularity_window).alias('popularity_rank'))
     task1_df = task1_df.select('*', rank().over(vote_average_window).alias('vote_average_rank'))
     task1_df = task1_df.select('*', rank().over(profit_window).alias('profit_rank'))
     task1_df = task1_df.select('*', rank().over(profit_window).alias('avg_user_rating_rank'))
-    task1_df = task1_df.where((col('poularity_rank') <= 10) | (col('vote_average_rank') <= 10) | (col('profit_rank') <= 10) | (col('avg_user_rating_rank') <= 10))
+    task1_df = task1_df.where((col('popularity_rank') <= 10) | (col('vote_average_rank') <= 10) | (col('profit_rank') <= 10) | (col('avg_user_rating_rank') <= 10))
     #drop unused columns
-    task1_df = task1_df.drop('poularity_rank', 'vote_average_rank', 'profit_rank', 'avg_user_rating_rank')
+    task1_df = task1_df.drop('popularity_rank', 'vote_average_rank', 'profit_rank', 'avg_user_rating_rank')
     #task1_df.where(col('title') == "The Guide").show()
     # print('task1 result')
     # task1_df.show(10)
@@ -98,12 +102,22 @@ def main():
     genre_movie_df = ex_movie_df.join(broadcast(genre_df), 'genre_id')
     genre_movie_df = genre_movie_df.cache()
 
-    #***task2 10 Most popular/highest return/highest avg rated/highest vote average genre each year (2000-2017)******
-    task2_df = genre_movie_df.select('profit', "vote_average", "popularity", 'avg_user_rating', "year", 'genre_name')
-    task2_df = task2_df.where((task2_df['year'] >= 2000) & (task2_df['year'] <= 2017))
-    task2_df = genre_movie_df.groupBy('year','genre_name').agg(avg(col('profit')).alias('profit'), avg(col('popularity')).alias('popularity'), avg(col('vote_average')).alias('vote_average'), avg(col('avg_user_rating')).alias('avg_user_rating'))
-    # print('task2 result')
-    # task2_df.show(10)
+    #***task2 Most popular/highest return/highest avg rated/highest vote average genre each year (all-time)******
+    task2_df = genre_movie_df.select('title', 'profit', "vote_average", "popularity", 'avg_user_rating', "year", 'genre_name')
+    #task2_df = task2_df.where((task2_df['year'] >= 2000) & (task2_df['year'] <= 2017))
+    task2_df = task2_df.where((task2_df['year'] <= 2017))
+    #task2_df.orderBy(col('year').desc()).show(100)
+    task2_df = task2_df.groupBy('year','genre_name').agg(count(col('title')).alias('movie count'), avg(col('profit')).alias('profit'), avg(col('popularity')).alias('popularity'), avg(col('vote_average')).alias('vote_average'), avg(col('avg_user_rating')).alias('avg_user_rating'))
+    task2_df = task2_df.select('*', rank().over(popularity_window).alias('popularity_rank'))
+    task2_df = task2_df.select('*', rank().over(vote_average_window).alias('vote_average_rank'))
+    task2_df = task2_df.select('*', rank().over(profit_window).alias('profit_rank'))
+    task2_df = task2_df.select('*', rank().over(profit_window).alias('avg_user_rating_rank'))
+    task2_df = task2_df.where((col('popularity_rank') <= 1) | (col('vote_average_rank') <= 1) | (col('profit_rank') <= 1) | (col('avg_user_rating_rank') <= 1))
+    task2_df = task2_df.select('year', 'avg_user_rating', 'profit', 'vote_average', 'popularity', 'genre_name')
+    #print('task2 result\n')
+    #print(task2_df.orderBy(col('year').desc()).count())
+    #task2_df.orderBy(col('year').desc()).show(10)
+    #print('task2 end\n')
     #task2_df.write.mode('overwrite').parquet(output_dir + "/task2")
 
     #******genre analysis task3 10 Most popular/highest return/highest avg rated/highest vote average movie in each genre (2000-2017)******
@@ -115,12 +129,12 @@ def main():
     genre_vote_average_window = Window.partitionBy('genre_name').orderBy(col('vote_average').desc())
     genre_avg_user_rating_window = Window.partitionBy('genre_name').orderBy(col('avg_user_rating').desc())
 
-    task3_df = task3_df.select('*', rank().over(genre_pop_window).alias('poularity_rank'))
+    task3_df = task3_df.select('*', rank().over(genre_pop_window).alias('popularity_rank'))
     task3_df = task3_df.select('*', rank().over(genre_profit_window).alias('profit_rank'))
     task3_df = task3_df.select('*', rank().over(genre_vote_average_window).alias('vote_average_rank'))
     task3_df = task3_df.select('*', rank().over(genre_avg_user_rating_window).alias('avg_user_rating_rank'))
-    task3_df = task3_df.where((col('poularity_rank') <= 10) | (col('vote_average_rank') <= 10) | (col('profit_rank') <= 10) | (col('avg_user_rating_rank') <= 10))
-    task3_df = task3_df.drop('poularity_rank', 'vote_average_rank', 'profit_rank', 'avg_user_rating_rank')
+    task3_df = task3_df.where((col('popularity_rank') <= 10) | (col('vote_average_rank') <= 10) | (col('profit_rank') <= 10) | (col('avg_user_rating_rank') <= 10))
+    task3_df = task3_df.drop('popularity_rank', 'vote_average_rank', 'profit_rank', 'avg_user_rating_rank')
     # print('task3 result')
     # task3_df.show(10)
     #task3_df.write.mode('overwrite').parquet(output_dir + "/task3")
@@ -143,6 +157,19 @@ def main():
     #print(task8_df.count())
     #task8_df.show(20)
     #task8_df.write.mode('overwrite').parquet(output_dir + "/task8")
+
+    #******task10 Most total popular production countries******
+    task10_df = cached_movie_df.select("popularity",'prod_country_ids')
+    task10_df = task10_df.select('*', explode(task10_df['prod_country_ids']).alias('country_id')).drop('prod_country_ids')
+    #No big difference in join
+    task10_df = task10_df.groupBy("country_id").agg(count('popularity').alias('count'))
+    task10_df = task10_df.join(broadcast(country_df), 'country_id')
+    # task10_df = task10_df.groupBy('collection_name').agg(count(col('profit')).alias('count'), avg(col('profit')).alias('profit'), avg(col('popularity')).alias('popularity'), avg(col('vote_average')).alias('vote_average'), avg(col('avg_user_rating')).alias('avg_user_rating'))
+    # task10_df = task10_df.where(task10_df['count'] > 1)
+    print('task10 result\n')
+    #print(task10_df.count(), country_df.count())
+    #task10_df.show(20)
+    #task10_df.write.mode('overwrite').parquet(output_dir + "/task10")
 
     #******task11 Collection with movies of highest avg popularity, highest return, highest avg return and highest avg rating******
     task11_df = cached_movie_df.select('profit', "vote_average", "popularity", 'avg_user_rating', 'collection_ids')

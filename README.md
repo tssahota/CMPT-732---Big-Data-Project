@@ -117,6 +117,8 @@ pip install pandas
 pip install dash
 pip install pyarrow
 pip install dash-bootstrap-components
+pip install iso3166
+pip install wordcloud
 
 cd web_dev
 python main.py
