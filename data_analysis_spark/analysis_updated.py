@@ -4,10 +4,7 @@ from pyspark.sql import SparkSession, types, Window
 from pyspark.sql.functions import rank, col, to_timestamp, year, month, explode, broadcast, avg, count, sum, lit, when
 from pyspark.sql import functions
 
-def main():
-    input_dir = "../Processed_Data"
-    output_dir = "../web_dev/apps/analysis_data"
-
+def main(input_dir, output_dir):
     #Read movie data
     movie_df = spark.read.parquet(input_dir+"/movies_aggregated_data.parquet")
     #variable made by Tavleen for analysis
@@ -41,7 +38,7 @@ def main():
     #movie_df.describe('popularity').show()
     #movie_df.describe('vote_average').show()
     #movie_df.show(1)
-    movie_df.printSchema()
+    #movie_df.printSchema()
     #print(movie_df.count())
     #drop rows contain null
     movie_df = movie_df.na.drop(subset=["title", 'release_date', "popularity", "profit", 'avg_user_rating', 'vote_average'])
@@ -68,8 +65,23 @@ def main():
     
     #******Read keyword detail data******
     keyword_df = spark.read.parquet(input_dir+"/keyword_details.parquet")
-    #collection_df.show(10)
-    
+    #keywords_df.show(10)
+
+    #******Read cast detail data******
+    cast_df = spark.read.parquet(input_dir+"/cast_details.parquet")
+    cast_power_df = spark.read.parquet(input_dir+"/cast_power.parquet")
+    cast_power_df.show(10)
+
+    #******Read crew detail data******
+    crew_df = spark.read.parquet(input_dir+"/crew_details.parquet")
+    director_power_df = spark.read.parquet(input_dir+"/director_power.parquet")
+    director_power_df.show(10)
+
+    #******Read Youtube detail data******
+    youtube_df = spark.read.parquet(input_dir+"/youtube_data.parquet")
+    youtube_df.show(10)
+
+    '''
     #******task1 10 Most popular/highest return/highest avg user-rated/highest vote average movies each year (2000-2017)******
     task1_df = cached_movie_df.select("title", 'profit', "vote_average", "popularity", 'avg_user_rating', "year")
     task1_df = task1_df.where((task1_df['year'] >= 2000) & (task1_df['year'] <= 2017))
@@ -78,7 +90,7 @@ def main():
     vote_average_window = Window.partitionBy('year').orderBy(col('vote_average').desc())
     profit_window = Window.partitionBy('year').orderBy(col('profit').desc())
     avg_user_rating_window = Window.partitionBy('year').orderBy(col('avg_user_rating').desc())
-
+    
     #call window and create new ranking columns
     task1_df = task1_df.select('*', rank().over(popularity_window).alias('poularity_rank'))
     task1_df = task1_df.select('*', rank().over(vote_average_window).alias('vote_average_rank'))
@@ -156,7 +168,7 @@ def main():
     #task11_df.write.mode('overwrite').parquet(output_dir + "/task11")
     
     #******task6 Most common words in movie titles******
-    #Insight: Were the most frequent choice of words for a movie title. A carefully chosen and intruiging title can boost box office sales and popularity a movie. Therefore, the most frequent choice may be worth noting '''
+    #Insight: Were the most frequent choice of words for a movie title. A carefully chosen and intruiging title can boost box office sales and popularity a movie. Therefore, the most frequent choice may be worth noting 
     task6_df = movie_data.select(functions.explode(functions.split(movie_data['title'], " ")).alias('title'))
     task6_df.show(20)
     #task6_df.write.mode('overwrite').parquet(output_dir + "/task6")
@@ -174,16 +186,57 @@ def main():
     task14_df = cached_movie_df.groupBy("month").agg(count(cached_movie_df['tmdb_id']).alias('count'), avg(cached_movie_df['profit']).alias('avg_profit'))
     task14_df.show(12)
     #task14_df.write.mode('overwrite').parquet(output_dir + "/task14")
+    '''
 
-    '''#******Correlation of popularity/highest return/highest avg user-rated/highest vote average with ******
-    task15_df = movie_data.na.drop.select(budget, popularity, revenue, vote_average, vote_count, runtime,avg_user_rating)
-    task15_df = cached_movie_df.groupBy("month").agg(count(cached_movie_df['tmdb_id']).alias('count'), sum(cached_movie_df['profit']).alias('sum'))
-    task15_df.show(12)
-    #task15_df.write.mode('overwrite').parquet(output_dir + "/task15")'''
+    #******Actors & Directors with highest average revenue/******
+    #calculate actor/cast_power
+    task16_df1 = cast_df.join(cast_power_df, cast_df['cast_id']==cast_power_df['cast_split']) \
+                        .select(cast_df['cast_name'].alias('name'), cast_power_df['cast_power'].alias('avg_revenue'), lit('Actor').alias('job'))
 
+    #calculate director_power
+    task16_df2 = crew_df.join(director_power_df, crew_df['crew_id']==director_power_df['director_split']) \
+                        .select(crew_df['crew_name'].alias('name'), director_power_df['director_power'].alias('avg_revenue'), lit('Director').alias('job'))
+    task16_df = task16_df1.union(task16_df2)
+    task16_df.show(5)
+    #use windows to partition and sort data
+    revenue_window = Window.partitionBy('job').orderBy(col('avg_revenue').desc())
+    
+    #call window and create new ranking columns
+    task16_df = task16_df.select('*', rank().over(revenue_window).alias('avg_revenue_rank'))
+    task16_df = task16_df.where((col('avg_revenue_rank') <= 10))
+    task16_df.show(5)
+    #task16_df.write.mode('overwrite').parquet(output_dir + "/task16")'''
+    
+    #***task18***Data Distribution and Outliers******   
+    movietube = movie_data.na.drop(subset=['budget', 'profit','popularity', 'revenue', 'vote_average', 'vote_count', 'runtime', 'avg_user_rating','tmdb_id'])\
+                             .select('budget', 'popularity', 'revenue', 'vote_average', 'vote_count', 'runtime', 'avg_user_rating','tmdb_id') \
+    movietube = movietube.join(youtube_df,  movietube['tmdb_id']==youtube_df['tmdb_id'],'left').select(movietube['*'], youtube_df['youtube_views'].alias('youtube_views'), \
+                               youtube_df['youtube_likes'].alias('youtube_likes'),youtube_df['youtube_dislikes'].alias('youtube_dislikes'))
+    movietube.cache()
+    task18_df  = movietube
+    task18_df.show(5)
+    #task18_df.write.mode('overwrite').parquet(output_dir + "/task18")'''
+    
+
+    from pyspark.ml.feature import VectorAssembler
+    from pyspark.ml.stat import Correlation
+    
+    #***task15***Correlation between continuous quantitative features******
+    task15_df = movietube
+    assembler = VectorAssembler(inputCols=['budget', 'profit','vote_average', 'vote_count','runtime', 'popularity','revenue', 'avg_user_rating',\
+                                           'youtube_views', 'youtube_likes','youtube_dislikes'],outputCol='features')
+    corr_df = assembler.transform(task15_df)
+    task15_dense_matrix = Correlation.corr(corr_df, "features").withColumnRenamed('pearson(features)', 'features').head().features
+    rows = task15_dense_matrix.toArray().tolist()
+    task15_df = spark.createDataFrame(rows,['budget','popularity', 'revenue', 'vote_average', 'vote_count', 'runtime', 'avg_user_rating'])
+    task15_df.show(10)
+    task15_df.write.mode('overwrite').parquet(output_dir + "/task15")
+    
 if __name__ == '__main__':
+    input_dir = sys.argv[1]
+    output_dir = sys.argv[2]
     spark = SparkSession.builder.appName("task1-3").getOrCreate()
     assert spark.version >= "2.4"  # make sure we have Spark 2.4+
     spark.sparkContext.setLogLevel("WARN")
     sc = spark.sparkContext
-    main()
+    main(input_dir, output_dir)
