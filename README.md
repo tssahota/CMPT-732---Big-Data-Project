@@ -117,3 +117,7 @@ python eric_ui.py
 pip install pandas
 pip install dash
 pip install pyarrow
+pip install dash-bootstrap-components
+
+cd web_dev
+python main.py
