@@ -106,7 +106,6 @@ Prediction:
 feature_engineering.py
 /spark-submit feature_engineering.py <processed_data_directory> <training_data_directory>
 
-
 # eric_analysis.py
 spark-submit eric_analysis.py
 
