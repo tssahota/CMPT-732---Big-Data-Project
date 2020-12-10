@@ -45,7 +45,7 @@ layout = html.Div([
             ], className="col-md-4"),
             html.Div(id='task2_p', children=[
                 html.P(
-                    id="description",
+                    id="task2_insight",
                     children="† Deaths are classified using the International Classification of Diseases, \
                     Tenth Revision (ICD–10). Drug-poisoning deaths are defined as having ICD–10 underlying \
                     cause-of-death codes X40–X44 (unintentional), X60–X64 (suicide), X85 (homicide), or Y10–Y14 \
@@ -71,7 +71,7 @@ def update_graph(slct_col):
     #filter col
     dff = dff.groupby(['year']).max()
     #print(dff)
-    fig = px.bar(data_frame=dff, y=slct_col, x=dff.index, orientation='v', text='genre_name', template="ggplot2")
+    fig = px.bar(data_frame=dff, y=slct_col, x=dff.index, orientation='v', text='genre_name', template="plotly_white", color='genre_name')
     fig.update_layout(
         #title="Plot Title",
         xaxis_title='Year',

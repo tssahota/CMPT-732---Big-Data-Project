@@ -70,7 +70,7 @@ layout = html.Div([
             ], className="col-md-4"),
             html.Div(id='task1_p', children=[
                 html.P(
-                    id="description",
+                    id="task1_insight",
                     children="† Deaths are classified using the International Classification of Diseases, \
                     Tenth Revision (ICD–10). Drug-poisoning deaths are defined as having ICD–10 underlying \
                     cause-of-death codes X40–X44 (unintentional), X60–X64 (suicide), X85 (homicide), or Y10–Y14 \
@@ -102,7 +102,7 @@ layout = html.Div([
             ], className="col-md-4"),
             html.Div(id='task3_p', children=[
                 html.P(
-                    id="description",
+                    id="task3_insight",
                     children="† Deaths are classified using the International Classification of Diseases, \
                     Tenth Revision (ICD–10). Drug-poisoning deaths are defined as having ICD–10 underlying \
                     cause-of-death codes X40–X44 (unintentional), X60–X64 (suicide), X85 (homicide), or Y10–Y14 \
@@ -127,7 +127,7 @@ layout = html.Div([
             ], className="col-md-4"),
             html.Div(id='task4_p', children=[
                 html.P(
-                    id="description",
+                    id="task4_insight",
                     children="† Deaths are classified using the International Classification of Diseases, \
                     Tenth Revision (ICD–10). Drug-poisoning deaths are defined as having ICD–10 underlying \
                     cause-of-death codes X40–X44 (unintentional), X60–X64 (suicide), X85 (homicide), or Y10–Y14 \

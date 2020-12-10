@@ -14,7 +14,6 @@ colorscale = ["#deebf7", "#d2e3f3", "#c6dbef", "#b3d2e9", "#9ecae1",
     "#08519c", "#0b4083", "#08306b"
 ]
 
-
 path_list = ['./apps/analysis_data/task8', './apps/analysis_data/task11', './apps/analysis_data/task10'] # use your path
 task_list = ['task8', 'task11', 'task10']
 df = {}
@@ -49,7 +48,7 @@ def change_iso_alpha(x):
         return None
 #task10_df
 task10_df['iso_alpha'] = task10_df['country_id'].apply(change_iso_alpha)
-print(task10_df)
+#print(task10_df)
 task10_fig = px.choropleth(task10_df, locations="iso_alpha",
                     color="count",
                     hover_name="country", # column to add to hover information
@@ -78,7 +77,7 @@ layout = html.Div([
             ], className="col-md-4"),
             html.Div(id='task8_p', children=[
                 html.P(
-                    id="description",
+                    id="task8_insight",
                     children="† Deaths are classified using the International Classification of Diseases, \
                     Tenth Revision (ICD–10). Drug-poisoning deaths are defined as having ICD–10 underlying \
                     cause-of-death codes X40–X44 (unintentional), X60–X64 (suicide), X85 (homicide), or Y10–Y14 \
@@ -110,7 +109,7 @@ layout = html.Div([
             ], className="col-md-4"),
             html.Div(id='task11_p', children=[
                 html.P(
-                    id="description",
+                    id="task11_insight",
                     children="† Deaths are classified using the International Classification of Diseases, \
                     Tenth Revision (ICD–10). Drug-poisoning deaths are defined as having ICD–10 underlying \
                     cause-of-death codes X40–X44 (unintentional), X60–X64 (suicide), X85 (homicide), or Y10–Y14 \
@@ -124,7 +123,7 @@ layout = html.Div([
     html.Div(id='task10_container', children=[
         html.H2(id='header_task10', style={'text-align': 'center'},children='Most popular production countries' ),
             html.P(
-                id="description",
+                id="task10_insight",
                 children="† Deaths are classified using the International Classification of Diseases, \
                 Tenth Revision (ICD–10). Drug-poisoning deaths are defined as having ICD–10 underlying \
                 cause-of-death codes X40–X44 (unintentional), X60–X64 (suicide), X85 (homicide), or Y10–Y14 \
