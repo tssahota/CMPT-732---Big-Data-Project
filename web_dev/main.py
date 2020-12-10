@@ -58,7 +58,7 @@ def toggle_active_links(pathname):
     if pathname == "/":
         # Treat page 1 as the homepage / index
         return True, False, False, False, False, False
-    return [pathname == f"{link_ids[i]}" for i in range(len(link_ids))]
+    return [pathname == f"/{link_ids[i]}" for i in range(len(link_ids))]
 
 
 @app.callback(Output("page-content", "children"), [Input("url", "pathname")])

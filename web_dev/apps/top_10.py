@@ -22,7 +22,6 @@ for i, path in enumerate(path_list):
     # Concatenate all data into one DataFrame
     df[task_list[i]] = pd.concat(dfs, ignore_index=True)
 
-
 genre_list = []
 for genre_name in df['task3']['genre_name'].unique():
     genre_list.append({"label": genre_name, "value": genre_name})
@@ -77,38 +76,6 @@ layout = html.Div([
             ], className="col-md-8"),
         ], className="row"),
         dcc.Graph(id='task1_bar_chart')
-    ]),
-
-    html.Div(id='task2_container', children=[
-        html.H2(id='header_task2', style={'text-align': 'center'}),
-        html.Div(id='task2_sub', children=[
-            html.Div(id='task2_choice', children=[
-                html.Label('Year:'),
-                dcc.Dropdown(id="slct_year_task2",
-                            options=year_label_list,
-                            multi=False,
-                            value=2017,
-                            clearable=False,
-                            ),
-                html.Label('Parameter:'),
-                dcc.Dropdown(id="slct_col_task2",
-                            options=col_list,
-                            multi=False,
-                            value="popularity",
-                            clearable=False,
-                            ),
-            ], className="col-md-4"),
-            html.Div(id='task2_p', children=[
-                html.P(
-                    id="description",
-                    children="† Deaths are classified using the International Classification of Diseases, \
-                    Tenth Revision (ICD–10). Drug-poisoning deaths are defined as having ICD–10 underlying \
-                    cause-of-death codes X40–X44 (unintentional), X60–X64 (suicide), X85 (homicide), or Y10–Y14 \
-                    (undetermined intent).",
-                ),
-            ], className="col-md-8"),
-        ], className="row"),
-        dcc.Graph(id='task2_bar_chart')
     ]),
     
     html.Div(id='task3_container', children=[
@@ -194,31 +161,6 @@ def update_graph(slct_year, slct_col):
         #title="Plot Title",
         xaxis_title=col_label[slct_col],
         yaxis_title='Title',
-    )
-    return container, fig
-
-#***Task2 callback***
-@app.callback(
-    [Output(component_id='header_task2', component_property='children'),
-     Output(component_id='task2_bar_chart', component_property='figure')],
-    [Input(component_id='slct_year_task2', component_property='value'),
-    Input(component_id='slct_col_task2', component_property='value')]
-)
-def update_graph(slct_year, slct_col):
-    print('task2 update', slct_year, slct_col)
-    container = f"Top 10 Average {col_label[slct_col]} Genres in {slct_year}"
-    dff = df["task2"].copy()
-    #filter col
-    dff = dff[dff["year"] == slct_year].sort_values(by=slct_col, ascending=False).head(10).sort_values(by=slct_col, ascending=True)
-    #print("task 1 dff", dff)
-    #filter rows
-    #dff = dff[dff["Affected by"] == "Varroa_mites"]
-    #text=slct_col,
-    fig = px.bar(data_frame=dff, y='genre_name', x=slct_col, orientation='h', text=slct_col, template="ggplot2", color=slct_col )
-    fig.update_layout(
-        #title="Plot Title",
-        xaxis_title=col_label[slct_col],
-        yaxis_title='Genre',
     )
     return container, fig
 
