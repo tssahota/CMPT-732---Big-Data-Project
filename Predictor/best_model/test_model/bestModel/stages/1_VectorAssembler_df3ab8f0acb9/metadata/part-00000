@@ -1,0 +1,1 @@
+{"class":"org.apache.spark.ml.feature.VectorAssembler","timestamp":1607706853377,"sparkVersion":"3.0.1","uid":"VectorAssembler_df3ab8f0acb9","paramMap":{"outputCol":"features","inputCols":["budget","vote_count","popularity","youtube_views","youtube_likes","keyword_power"]},"defaultParamMap":{"handleInvalid":"error","outputCol":"VectorAssembler_df3ab8f0acb9__output"}}
