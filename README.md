@@ -33,21 +33,21 @@ feature_engineering.py
 
 ## 1. Change current directory to web_dev folder from the root of git folder
 ```
-cd web_dev
+$cd web_dev
 ```
 ## 2. Install necessary packages in Python
 ```
-pip install pandas
-pip install dash
-pip install pyarrow
-pip install dash-bootstrap-components
-pip install Pillow
-pip install iso3166
+$pip install pandas
+$pip install dash
+$pip install pyarrow
+$pip install dash-bootstrap-components
+$pip install Pillow
+$pip install iso3166
 ```
 
 ## 3. Run Dash App
 ```
-python app.py
+$python app.py
 ```
 ###### Notes
 * Tested with python==3.6.0 in Anaconda virtual environment.
