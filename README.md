@@ -43,7 +43,7 @@ pip install pyarrow
 pip install dash-bootstrap-components
 pip install iso3166
 pip install wordcloud
-pip install virtualenv
+pip install gunicorn
 
 cd web_dev
-python main.py
+python app.py
