@@ -21,9 +21,7 @@ for i, path in enumerate(path_list):
     # Concatenate all data into one DataFrame
     df[task_list[i]] = pd.concat(dfs, ignore_index=True)
 
-print(df['task15'])
-
-
+#print(df['task15'])
 col_names = df['task18'].columns
 # col_label = {}
 # col_label['vote_average'] = 'TMDB critics rating (Max=10)'
@@ -38,6 +36,7 @@ col_list = []
 for col_name in col_names:
     col_list.append({"label": col_name, "value": col_name})
 
+column_name_list = df['task15'].columns.tolist()
 
 layout = html.Div([
     html.Div(id='task18_container', children=[
@@ -83,14 +82,19 @@ layout = html.Div([
             cause-of-death codes X40–X44 (unintentional), X60–X64 (suicide), X85 (homicide), or Y10–Y14 \
             (undetermined intent).",
         ),
-        html.P("Included:"),
-        dcc.Checklist(
-            id='task15_parameters',
-            options=[{'label': x, 'value': x} 
-                    for x in df['task15'].columns],
-            value=df['task15'].columns.tolist(),
-        ),
-        dcc.Graph(id="task15_heatmap"),
+        #html.P("Included:"),
+        # dcc.Checklist(
+        #     id='task15_parameters',
+        #     options=[{'label': x, 'value': x} 
+        #             for x in df['task15'].columns],
+        #     value=df['task15'].columns.tolist(),
+        # ),
+        dcc.Graph(id="task15_heatmap", figure= 
+            px.imshow(df['task15'],
+            labels=dict(x="Parameter X", y="Parameters Y"),
+            x=column_name_list,
+            y=column_name_list
+        )),
      ]),
 ])
 
@@ -122,15 +126,17 @@ def update_graph(slct_col):
     )
     return fig
 
-#***Task15 callback***
-@app.callback(
-    Output("task15_heatmap", "figure"), 
-    [Input("task15_parameters", "value")])
-def filter_heatmap(cols):
-    fig = px.imshow(df['task15'][cols],
-                labels=dict(x="Parameter X", y="Parameters Y"),
-                x=df['task15'].columns.tolist(),
-                y=df['task15'].columns.tolist()
-               )
-    fig.update_xaxes(side="top")
-    return fig
+# #***Task15 callback***
+# @app.callback(
+#     Output("task15_heatmap", "figure"), 
+#     [Input("task15_parameters", "value")])
+# def filter_heatmap(cols):
+#     print(df['task15'][cols].columns.tolist())
+#     column_name_list = df['task15'][cols].columns.tolist()
+#     fig = px.imshow(df['task15'][cols],
+#         labels=dict(x="Parameter X", y="Parameters Y"),
+#         x=column_name_list,
+#         y=column_name_list
+#     )
+#     fig.update_xaxes(side="top")
+#     return fig
