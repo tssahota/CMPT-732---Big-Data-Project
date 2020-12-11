@@ -159,7 +159,7 @@ def update_graph(slct_year, slct_col):
     #filter rows
     #dff = dff[dff["Affected by"] == "Varroa_mites"]
     #text=slct_col,
-    fig = px.bar(data_frame=dff, y='title', x=slct_col, orientation='h', text=slct_col, template="plotly_white", color_continuous_scale=colorscale, color=slct_col )
+    fig = px.bar(data_frame=dff, y='title', x=slct_col, orientation='h', text=slct_col, template="plotly_white", color_continuous_scale=colorscale, color=slct_col)
     fig.update_layout(
         #title="Plot Title",
         xaxis_title=col_label[slct_col],
