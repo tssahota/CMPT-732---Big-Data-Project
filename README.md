@@ -45,11 +45,10 @@ pip install iso3166
 3. Run Dash App
 python app.py
 
-* Note
-Tested with python==3.6.0 in anaconda virtual environment.
+* Tested with python==3.6.0 in anaconda virtual environment.
 
-Images files are in web_dev/img folder.
+* Images files are in web_dev/img folder.
 
-web_dev/apps folder contain dash code of different pages.
+* web_dev/apps folder contain dash code of different pages.
 
-web_dev/apps/analysis_data contain processed data from spark which divide into corresponding task folder.
+* web_dev/apps/analysis_data contain processed data from spark which divide into corresponding task folder.
