@@ -10,6 +10,7 @@ import glob
 #from wordcloud import WordCloud, STOPWORDS
 from PIL import Image
 
+
 from app_temp import app
 
 path_list = ['./apps/analysis_data/task6', './apps/analysis_data/task7'] # use your path

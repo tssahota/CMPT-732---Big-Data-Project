@@ -4,10 +4,17 @@ from dash.dependencies import Input, Output
 import dash_bootstrap_components as dbc
 from datetime import datetime
 #from pyspark.sql import SparkSession, Row
-#from pyspark import SparkConf
+from pyspark import SparkConf, SparkContext
+from pyspark.sql import SparkSession, Row
 from app_temp import app
+from pyspark.ml import PipelineModel
 
-#SparkConf conf = new SparkConf()
+
+conf = SparkConf().setAppName("PySpark App").set("spark.driver.allowMultipleContexts", "true").setMaster("local")
+sc = SparkContext(conf=conf)
+spark = SparkSession.builder.appName("ui").getOrCreate()
+#model = PipelineModel.load('./apps/bestModel')
+
 
 #spark = SparkSession.builder.appName("task").getOrCreate()
 #spark.driver.allowMultipleContexts = True
@@ -218,6 +225,14 @@ def predict_features(budget, vote_average, vote_count, popularity, runtime, rele
             else: 
                 features_res[feature] = temp[i]
         print(features_res)
+        temp_res = {'budget': 100, 'vote_count': 100, 'popularity': 100, 'collection': True}
+        sc_df = spark.createDataFrame(Row(**i) for i in [temp_res])
+        sc_df.show()
+
+        # predictions = model.transform(sc_df)
+        # predictions.show()
+        # prediction = predictions.collect()[0].asDict()['prediction']
+
         #spark_df = spark.createDataFrame([Row(features_res)])
         #print(spark_df.schema)
         #spark_df.show()
