@@ -45,7 +45,7 @@ pip install iso3166
 3. Run Dash App
 python app.py
 
-* Tested with python==3.6.0 in anaconda virtual environment.
+* Tested with python==3.6.0 in Anaconda virtual environment.
 
 * Images files are in web_dev/img folder.
 
