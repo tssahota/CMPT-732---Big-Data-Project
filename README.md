@@ -31,10 +31,10 @@ feature_engineering.py
 
 # Dash App (UI)
 
-1. Change current directory to web_dev folder from the root of git folder
+## 1. Change current directory to web_dev folder from the root of git folder
 cd web_dev
 
-2. Install necessary packages in Python
+## 2. Install necessary packages in Python
 pip install pandas
 pip install dash
 pip install pyarrow
@@ -42,9 +42,10 @@ pip install dash-bootstrap-components
 pip install Pillow
 pip install iso3166
 
-3. Run Dash App
+## 3. Run Dash App
 python app.py
 
+###### Notes
 * Tested with python==3.6.0 in Anaconda virtual environment.
 
 * Images files are in web_dev/img folder.
