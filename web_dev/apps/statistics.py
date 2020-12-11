@@ -90,10 +90,11 @@ layout = html.Div([
         #     value=df['task15'].columns.tolist(),
         # ),
         dcc.Graph(id="task15_heatmap", figure= 
-            px.imshow(df['task15'],
-            labels=dict(x="Parameter X", y="Parameters Y"),
+            px.imshow(
+            df['task15'],
+            labels=dict(x="Parameter X", y="Parameters Y", color="Correlation"),
             x=column_name_list,
-            y=column_name_list
+            y=column_name_list,
         )),
      ]),
 ])
