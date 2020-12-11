@@ -2,9 +2,15 @@ import dash_core_components as dcc
 import dash_html_components as html
 from dash.dependencies import Input, Output
 import dash_bootstrap_components as dbc
-from datetime import date
-
+from datetime import datetime
+#from pyspark.sql import SparkSession, Row
+#from pyspark import SparkConf
 from app_temp import app
+
+#SparkConf conf = new SparkConf()
+
+#spark = SparkSession.builder.appName("task").getOrCreate()
+#spark.driver.allowMultipleContexts = True
 
 director_options=[
         {'label': 'New York City', 'value': 'NYC'},
@@ -121,7 +127,7 @@ layout = html.Div([
                         id="release_date",
                         clearable=True,
                         with_portal=True,
-                        display_format='MMM D',
+                        display_format='MMM D YYYY',
                     ),
                     dbc.Button("Predict", id="predict_btn", color="primary", className="ml-5 float-right"),
                 ], style={'margin-top': '5px'}),
@@ -207,9 +213,14 @@ def predict_features(budget, vote_average, vote_count, popularity, runtime, rele
         temp = [budget, vote_average, vote_count, popularity, runtime, release_date]
         for i, feature in enumerate(features):
             if i == len(temp)-1:
-                print('hi')   
-            features_res[feature] = temp[i]
+                #print(temp[i])
+                features_res[feature] = datetime.strptime(temp[i], '%Y-%m-%d').timetuple().tm_yday
+            else: 
+                features_res[feature] = temp[i]
         print(features_res)
+        #spark_df = spark.createDataFrame([Row(features_res)])
+        #print(spark_df.schema)
+        #spark_df.show()
         #update predict result
         return 1000000000000000000034597839459835798345
     else:

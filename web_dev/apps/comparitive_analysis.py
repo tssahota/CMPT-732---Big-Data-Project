@@ -56,7 +56,7 @@ task9_fig.update_layout(
 
 #******task14******
 task14_pie_fig = px.pie(df['task14'], values='count', names='month', title='Number of Movies Released Each Month')
-task14_bar_fig = px.bar(data_frame=df['task14'], y='avg_profit', x='month', orientation='v', text='month', template="plotly_white", title='Average Profit Each Month')
+task14_bar_fig = px.bar(data_frame=df['task14'], y='avg_profit', x='month', orientation='v', text='month', template="plotly", title='Average Profit Each Month')
 task14_bar_fig.update_layout(
     xaxis_title="Month",
     yaxis_title='Average Profit',
