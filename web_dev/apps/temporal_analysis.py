@@ -6,7 +6,7 @@ import dash_html_components as html
 from dash.dependencies import Input, Output
 import glob
 
-from app import app
+from app_temp import app
 
 path_list = ['./apps/analysis_data/task2'] # use your path
 task_list = ['task2']

@@ -7,7 +7,7 @@ import dash_html_components as html
 from dash.dependencies import Input, Output
 import glob
 
-from app import app
+from app_temp import app
 colorscale = [ "#c6dbef", "#b3d2e9", "#9ecae1",
     "#85bcdb", "#6baed6", "#57a0ce", "#4292c6", "#3082be", "#2171b5", "#1361a9",
     "#08519c", "#0b4083", "#08306b"

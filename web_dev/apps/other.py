@@ -7,7 +7,7 @@ from dash.dependencies import Input, Output
 import glob
 from iso3166 import countries
 
-from app import app
+from app_temp import app
 
 colorscale = ["#deebf7", "#d2e3f3", "#c6dbef", "#b3d2e9", "#9ecae1",
     "#85bcdb", "#6baed6", "#57a0ce", "#4292c6", "#3082be", "#2171b5", "#1361a9",

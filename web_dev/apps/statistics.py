@@ -7,7 +7,7 @@ import dash_html_components as html
 from dash.dependencies import Input, Output
 import glob
 
-from app import app
+from app_temp import app
 
 layout = html.Div([
     html.H2('stat', id='header', style={'text-align': 'center'}),

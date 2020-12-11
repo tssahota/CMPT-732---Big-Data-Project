@@ -4,7 +4,7 @@ from dash.dependencies import Input, Output
 import dash_bootstrap_components as dbc
 from datetime import date
 
-from app import app
+from app_temp import app
 
 director_options=[
         {'label': 'New York City', 'value': 'NYC'},
