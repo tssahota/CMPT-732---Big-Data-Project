@@ -29,21 +29,27 @@ Prediction:
 feature_engineering.py
 /spark-submit feature_engineering.py <processed_data_directory> <training_data_directory>
 
-# eric_analysis.py
-spark-submit eric_analysis.py <input_directory> <output_directory>
-Recommended: spark-submit eric_analysis.py Processed_Data/ web-dev/apps/analysis_data/
+# Dash App (UI)
 
-# eric_ui.py
-python eric_ui.py
+1. Change current directory to web_dev folder from the root of git folder
+cd web_dev
 
-# UI
+2. Install necessary packages in Python
 pip install pandas
 pip install dash
 pip install pyarrow
 pip install dash-bootstrap-components
+pip install Pillow
 pip install iso3166
-pip install wordcloud
-pip install gunicorn
 
-cd web_dev
+3. Run Dash App
 python app.py
+
+4. Note
+Tested with python==3.6.0 in anaconda virtual environment.
+
+Images files are in web_dev/img folder.
+
+web_dev/apps folder contain dash code of different pages.
+
+web_dev/apps/analysis_data contain processed data from spark which divide into corresponding task folder.
