@@ -74,6 +74,24 @@ layout = html.Div([
             ], className="col-md-6"),
         ], className="row"),
     ]),
+     html.Div(id='task15_container', children=[
+        html.H2(id='header_task15', style={'text-align': 'center'}, children='Correlation Heatmap'),
+        html.P(
+            id="task15_insight",
+            children="† Deaths are classified using the International Classification of Diseases, \
+            Tenth Revision (ICD–10). Drug-poisoning deaths are defined as having ICD–10 underlying \
+            cause-of-death codes X40–X44 (unintentional), X60–X64 (suicide), X85 (homicide), or Y10–Y14 \
+            (undetermined intent).",
+        ),
+        html.P("Included:"),
+        dcc.Checklist(
+            id='task15_parameters',
+            options=[{'label': x, 'value': x} 
+                    for x in df['task15'].columns],
+            value=df['task15'].columns.tolist(),
+        ),
+        dcc.Graph(id="task15_heatmap"),
+     ]),
 ])
 
 #***Task18 callback l***
@@ -102,4 +120,17 @@ def update_graph(slct_col):
         box=True,
         points='all',
     )
+    return fig
+
+#***Task15 callback***
+@app.callback(
+    Output("task15_heatmap", "figure"), 
+    [Input("task15_parameters", "value")])
+def filter_heatmap(cols):
+    fig = px.imshow(df['task15'][cols],
+                labels=dict(x="Parameter X", y="Parameters Y"),
+                x=df['task15'].columns.tolist(),
+                y=df['task15'].columns.tolist()
+               )
+    fig.update_xaxes(side="top")
     return fig
