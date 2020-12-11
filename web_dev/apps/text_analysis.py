@@ -6,7 +6,7 @@ import dash_core_components as dcc
 import dash_html_components as html
 from dash.dependencies import Input, Output
 import glob
-import matplotlib.pyplot as plt
+#import matplotlib.pyplot as plt
 from wordcloud import WordCloud, STOPWORDS
 from PIL import Image
 
@@ -27,13 +27,13 @@ for i, path in enumerate(path_list):
 try: 
     img6 = Image.open('./img/task6_Word_Cloud.png')
 except:
-    df['task6'] = df['task6']
-    df['task6'] = df['task6'].astype('str')
-    title_wordcloud = WordCloud(stopwords=STOPWORDS, background_color='white', height=2000, width=4000).generate(' '.join((df['task6']['title'])))
-    plt.figure(figsize=(16,8))
-    plt.imshow(title_wordcloud)
-    plt.axis('off') # to off the axis of x and y
-    plt.savefig('./img/task6_Word_Cloud.png')
+    # df['task6'] = df['task6']
+    # df['task6'] = df['task6'].astype('str')
+    # title_wordcloud = WordCloud(stopwords=STOPWORDS, background_color='white', height=2000, width=4000).generate(' '.join((df['task6']['title'])))
+    # plt.figure(figsize=(16,8))
+    # plt.imshow(title_wordcloud)
+    # plt.axis('off') # to off the axis of x and y
+    # plt.savefig('./img/task6_Word_Cloud.png')
     img6 = Image.open('./img/task6_Word_Cloud.png')
 # Constants
 img_width = 1600
@@ -91,13 +91,13 @@ fig6.update_layout(
 try: 
     img7 = Image.open('./img/task7_Word_Cloud.png')
 except:
-    df['task7'] = df['task7']
-    df['task7'] = df['task7'].astype('str')
-    overview_wordcloud = WordCloud(stopwords=STOPWORDS, background_color='white', height=2000, width=4000).generate(' '.join((df['task7']['keyword'])))
-    plt.figure(figsize=(16,8))
-    plt.imshow(overview_wordcloud)
-    plt.axis('off') # to off the axis of x and y
-    plt.savefig('./img/task7_Word_Cloud.png')
+    # df['task7'] = df['task7']
+    # df['task7'] = df['task7'].astype('str')
+    # overview_wordcloud = WordCloud(stopwords=STOPWORDS, background_color='white', height=2000, width=4000).generate(' '.join((df['task7']['keyword'])))
+    # plt.figure(figsize=(16,8))
+    # plt.imshow(overview_wordcloud)
+    # plt.axis('off') # to off the axis of x and y
+    # plt.savefig('./img/task7_Word_Cloud.png')
     img7 = Image.open('./img/task7_Word_Cloud.png')
 # Constants
 img_width = 1600
