@@ -1,0 +1,1 @@
+{"class":"org.apache.spark.ml.feature.SQLTransformer","timestamp":1607706853321,"sparkVersion":"3.0.1","uid":"SQLTransformer_1541e0979dc5","paramMap":{"statement":"SELECT budget, popularity, revenue, keyword_power,youtube_views, youtube_likes, vote_count  FROM __THIS__ "},"defaultParamMap":{}}

@@ -12,13 +12,13 @@ from pyspark.ml.evaluation import RegressionEvaluator
 from pyspark.ml import Pipeline
 from pyspark.ml.feature import VectorAssembler, SQLTransformer
 from pyspark.ml.regression import LinearRegression, GBTRegressor, GBTParams, GBTRegressionModel, GeneralizedLinearRegression, DecisionTreeRegressor
-#from pyspark.ml.tuning import TrainValidationSplitModel
+from pyspark.ml.tuning import TrainValidationSplitModel
 
 conf = SparkConf().setAppName("PySpark App").set("spark.driver.allowMultipleContexts", "true").setMaster("local")
 sc = SparkContext(conf=conf)
 spark = SparkSession.builder.appName("ui").getOrCreate()
-#model = TrainValidationSplitModel.read().load('./apps/150_depth_4')
-model = PipelineModel.load('./apps/150_depth_4/')
+model = TrainValidationSplitModel.read().load('./apps/best_model')
+#model = PipelineModel.load('./apps/150_depth_4/')
 
 #spark = SparkSession.builder.appName("task").getOrCreate()
 #spark.driver.allowMultipleContexts = True
