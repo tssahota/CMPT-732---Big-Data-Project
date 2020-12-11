@@ -14,8 +14,8 @@ colorscale = [ "#c6dbef", "#b3d2e9", "#9ecae1",
 ]
 # ------------------------------------------------------------------------------
 # Import and clean data (importing csv into pandas)
-path_list = ['./apps/analysis_data/task1', './apps/analysis_data/task2', './apps/analysis_data/task3', './apps/analysis_data/task4'] # use your path
-task_list = ['task1', 'task2', 'task3', 'task4']
+path_list = ['./apps/analysis_data/task1', './apps/analysis_data/task2', './apps/analysis_data/task3', './apps/analysis_data/task4', './apps/analysis_data/task16'] # use your path
+task_list = ['task1', 'task2', 'task3', 'task4', 'task16']
 df = {}
 for i, path in enumerate(path_list):
     filenames = glob.glob(path+"/*.parquet")
@@ -46,6 +46,13 @@ col_list = [{"label": col_label["popularity"], "value": "popularity"},
             {"label": col_label['vote_average'], "value": "vote_average"},
             {"label": col_label['avg_user_rating'], "value": "avg_user_rating"}]
 
+# task16_col_label = {}
+# task16_col_label['vote_average'] = 'TMDB critics rating (Max=10)'
+# task16_col_label['avg_user_rating'] = 'Average User Rating (Max=5)'
+
+job_list = []
+for job_name in df['task16']['job'].unique():
+    job_list.append({"label": job_name, "value": job_name})
 # ------------------------------------------------------------------------------
 # App layout
 layout = html.Div([
@@ -137,6 +144,38 @@ layout = html.Div([
         ], className="row"),
         dcc.Graph(id='task4_bar_chart')
     ]),
+
+       html.Div(id='task16_container', children=[
+        html.H2(id='header_task16', style={'text-align': 'center'}),
+        html.Div(id='task2_sub', children=[
+            html.Div(id='task2_choice', children=[
+                html.Label('Job:'),
+                dcc.Dropdown(id="slct_job_task16",
+                    options=job_list,
+                    multi=False,
+                    value='Actor',
+                    clearable=False
+                ),
+                # html.Label('Parameter:'),
+                # dcc.Dropdown(id="slct_col_task16",
+                #     options=col_list,
+                #     multi=False,
+                #     value="popularity",
+                #     clearable=False
+                # ),
+            ], className="col-md-4"),
+            html.Div(id='task16_p', children=[
+                html.P(
+                    id="task16_insight",
+                    children="† Deaths are classified using the International Classification of Diseases, \
+                    Tenth Revision (ICD–10). Drug-poisoning deaths are defined as having ICD–10 underlying \
+                    cause-of-death codes X40–X44 (unintentional), X60–X64 (suicide), X85 (homicide), or Y10–Y14 \
+                    (undetermined intent).",
+                ),
+            ], className="col-md-8"),
+        ], className="row"),
+        dcc.Graph(id='task16_bar_chart')
+    ]),
 ])
 
 
@@ -207,5 +246,25 @@ def update_graph(slct_col):
         #title="Plot Title",
         xaxis_title=col_label[slct_col],
         yaxis_title='Production Company',
+    )
+    return container, fig
+
+#***Task16 callback***
+@app.callback(
+    [Output(component_id='header_task16', component_property='children'),
+    Output(component_id='task16_bar_chart', component_property='figure')],
+    [Input(component_id='slct_job_task16', component_property='value')]
+)
+def update_graph(slct_job):
+    print('task16 update', slct_job)
+    container = f"Top 10 Average Revenue {slct_job}s of All Time"
+    dff = df["task16"].copy()
+    #filter col
+    dff = dff[dff["job"] == slct_job].sort_values(by='avg_revenue', ascending=False).head(10).sort_values(by='avg_revenue', ascending=True)
+    #print("task3_dff", dff)
+    fig = px.bar(data_frame=dff, y='name', x='avg_revenue', orientation='h', text='avg_revenue', template="plotly_white", color_continuous_scale=colorscale, color='avg_revenue')
+    fig.update_layout(
+        xaxis_title='Average Revenue',
+        yaxis_title='Name',
     )
     return container, fig

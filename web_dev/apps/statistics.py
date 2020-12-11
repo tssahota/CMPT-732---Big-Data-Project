@@ -124,6 +124,7 @@ def update_graph(slct_col):
         y=slct_col,
         box=True,
         points='all',
+        template="ggplot2"
     )
     return fig
 

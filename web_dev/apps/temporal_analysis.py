@@ -149,7 +149,8 @@ def update_graph(slct_col):
 def update_graph(slct_col):
     fig = px.line(
     df['task19'].sort_values(by=['year']), 
-        x='year',
+        x='year', 
         y=slct_col,
+        template="ggplot2"
     )
     return fig

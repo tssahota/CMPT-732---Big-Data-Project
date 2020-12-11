@@ -29,7 +29,8 @@ cast_options=[
     {'label': 'sgdfgdgfgadssasd', 'value': 'Sg'},
 ]
 
-features = ['budget', 'genre', 'director', 'cast', 'runtime', 'release_date']
+#features = ['budget', 'genre', 'director', 'cast', 'runtime', 'release_date']
+features = ['budget', 'vote_average', 'vote_count','popularity', 'runtime', 'release_date']
 
 layout = html.Div([
     html.Div(id='predictor_container', children=[
@@ -47,32 +48,63 @@ layout = html.Div([
                     ),
                 ]),
                 html.Div(children=[
-                    html.Label('Genre'),
-                    dcc.Dropdown(
-                        id='genre',
-                        options=genre_options,
-                        value=['MTL', 'NYC'],
-                        multi=True,
-                    )
+                    html.Label('Vote Average'),
+                    dbc.Input(
+                        id="vote_average",
+                        placeholder="Vote Average",
+                        type='number',
+                        min=0,
+                        max=5,
+                        style={'width': '100%'}
+                    ),
                 ], style={'margin-top': '5px'}),
                 html.Div(children=[
-                    html.Label('Director'),
-                    dcc.Dropdown(
-                        id='director',
-                        options=director_options,
-                        value=['MTL'],
-                        multi=True,
-                    )
+                    html.Label('Vote Count'),
+                    dbc.Input(
+                        id="vote_count",
+                        placeholder="Vote Count",
+                        type='number',
+                        min=0,
+                        style={'width': '100%'}
+                    ),
                 ], style={'margin-top': '5px'}),
                 html.Div(children=[
-                    html.Label('Cast'),
-                    dcc.Dropdown(
-                        id='cast',
-                        options=cast_options,
-                        value=['MTL'],
-                        multi=True,
-                    )
+                    html.Label('Popularity'),
+                    dbc.Input(
+                        id="popularity",
+                        placeholder="Popularity",
+                        type='number',
+                        min=0,
+                        style={'width': '100%'}
+                    ),
                 ], style={'margin-top': '5px'}),
+                # html.Div(children=[
+                #     html.Label('Genre'),
+                #     dcc.Dropdown(
+                #         id='genre',
+                #         options=genre_options,
+                #         value=['MTL', 'NYC'],
+                #         multi=True,
+                #     )
+                # ], style={'margin-top': '5px'}),
+                # html.Div(children=[
+                #     html.Label('Director'),
+                #     dcc.Dropdown(
+                #         id='director',
+                #         options=director_options,
+                #         value=['MTL'],
+                #         multi=True,
+                #     )
+                # ], style={'margin-top': '5px'}),
+                # html.Div(children=[
+                #     html.Label('Cast'),
+                #     dcc.Dropdown(
+                #         id='cast',
+                #         options=cast_options,
+                #         value=['MTL'],
+                #         multi=True,
+                #     )
+                # ], style={'margin-top': '5px'}),
                 html.Div(children=[
                     html.Label('Run Time'),
                     dbc.Input(
@@ -124,56 +156,58 @@ layout = html.Div([
 
 # ------------------------------------------------------------------------------
 # Connect the Plotly graphs with Dash Components
-@app.callback(
-    Output(component_id="director", component_property="options"),
-    [Input(component_id="director", component_property="value"),],
-)
-def update_dropdown_options(values):
-    if values and len(values) == 1:
-        return [option for option in director_options if option["value"] in values]
-    else:
-        return director_options
+# @app.callback(
+#     Output(component_id="director", component_property="options"),
+#     [Input(component_id="director", component_property="value"),],
+# )
+# def update_dropdown_options(values):
+#     if values and len(values) == 1:
+#         return [option for option in director_options if option["value"] in values]
+#     else:
+#         return director_options
 
-@app.callback(
-    Output(component_id="genre", component_property="options"),
-    [Input(component_id="genre", component_property="value"),],
-)
-def update_dropdown_options(values):
-    if values and len(values) == 3:
-        return [option for option in genre_options if option["value"] in values]
-    else:
-        return genre_options
+# @app.callback(
+#     Output(component_id="genre", component_property="options"),
+#     [Input(component_id="genre", component_property="value"),],
+# )
+# def update_dropdown_options(values):
+#     if values and len(values) == 3:
+#         return [option for option in genre_options if option["value"] in values]
+#     else:
+#         return genre_options
 
-@app.callback(
-    Output(component_id="cast", component_property="options"),
-    [Input(component_id="cast", component_property="value"),],
-)
-def update_dropdown_options(values):
-    if values and len(values) == 3:
-        return [option for option in cast_options if option["value"] in values]
-    else:
-        return cast_options
+# @app.callback(
+#     Output(component_id="cast", component_property="options"),
+#     [Input(component_id="cast", component_property="value"),],
+# )
+# def update_dropdown_options(values):
+#     if values and len(values) == 3:
+#         return [option for option in cast_options if option["value"] in values]
+#     else:
+#         return cast_options
 
 @app.callback(
     Output(component_id="predict_result", component_property="value"),
     [Input(component_id="budget", component_property="value"),
-    Input(component_id="genre", component_property="value"),
-    Input(component_id="director", component_property="value"), 
-    Input(component_id="cast", component_property="value"),
+    Input(component_id="vote_average", component_property="value"),
+    Input(component_id="vote_count", component_property="value"), 
+    Input(component_id="popularity", component_property="value"),
     Input(component_id="runtime", component_property="value"),
     Input(component_id="release_date", component_property="date"),
     Input("predict_btn", "n_clicks")
     ],
 )
-def predict_features(budget, genre, director, cast, runtime, release_date, n):
+def predict_features(budget, vote_average, vote_count, popularity, runtime, release_date, n):
     # if release_date is not None:
     #     date_object = date.fromisoformat(release_date)
     #     date_string = date_object.strftime('%B %d, %Y')
     #     print (string_prefix + date_string)
     if n:
         features_res = {}
-        temp = [budget, genre, director, cast, runtime, release_date]
+        temp = [budget, vote_average, vote_count, popularity, runtime, release_date]
         for i, feature in enumerate(features):
+            if i == len(temp)-1:
+                print('hi')   
             features_res[feature] = temp[i]
         print(features_res)
         #update predict result

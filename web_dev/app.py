@@ -3,7 +3,7 @@ import dash_bootstrap_components as dbc
 import dash_core_components as dcc
 import dash_html_components as html
 from dash.dependencies import Input, Output
-from apps import top_10, temporal_analysis, text_analysis, statistics, predictor, other
+from apps import top_10, temporal_analysis, text_analysis, statistics, predictor, comparitive_analysis, other
 from app_temp import app
 
 # the style arguments for the sidebar. We use position:fixed and a fixed width
@@ -25,8 +25,8 @@ CONTENT_STYLE = {
     "padding": "2rem 1rem",
 }
 
-link_ids = ['top_10', 'temporal_analysis', 'text_analysis', 'statistics', 'predictor', 'other']
-link_label = ['Top 10', 'Temporal Analysis', 'Text Analysis', 'Statistics', 'Predictor', 'Other']
+link_ids = ['top_10', 'temporal_analysis', 'text_analysis', 'statistics', 'predictor', 'comparitive_analysis', 'other']
+link_label = ['Top 10', 'Temporal Analysis', 'Text Analysis', 'Statistics', 'Predictor', 'Comparitive Analysis', 'Other']
 
 navLinks = []
 for i in range(len(link_ids)):
@@ -57,7 +57,7 @@ app.layout = html.Div([dcc.Location(id="url"), sidebar, content])
 def toggle_active_links(pathname):
     if pathname == "/":
         # Treat page 1 as the homepage / index
-        return True, False, False, False, False, False
+        return True, False, False, False, False, False, False
     return [pathname == f"/{link_ids[i]}" for i in range(len(link_ids))]
 
 
@@ -74,6 +74,8 @@ def render_page_content(pathname):
         return statistics.layout
     elif pathname == "/predictor":
         return predictor.layout
+    elif pathname == "/comparitive_analysis":
+        return comparitive_analysis.layout
     elif pathname == "/other":
         return other.layout
     # If the user tries to reach a different page, return a 404 message
