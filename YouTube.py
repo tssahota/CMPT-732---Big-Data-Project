@@ -4,7 +4,10 @@ from pyspark.sql import SparkSession, functions, types, Row
 from pyspark.sql.functions import year, month, dayofmonth, concat, col, lit
 from apiclient.discovery import build 
 
-DEVELOPER_KEY = "AIzaSyDku6E5nukRmgakP6eMAqbLYgCrPTwvb6c" 
+#DEVELOPER_KEY = "AIzaSyDku6E5nukRmgakP6eMAqbLYgCrPTwvb6c" 
+#DEVELOPER_KEY = "AIzaSyBn0AkjXnSLDwy8jTOSlpGirgA_AuuYP-A"
+#DEVELOPER_KEY = 'AIzaSyBYy-xX20YNcl_csTVcG-lHNZ_1EWdv9i8'
+DEVELOPER_KEY='AIzaSyB1Vxb7bVgIdoScNsVA5AY4fVnXB4AM3c0'
 YOUTUBE_API_SERVICE_NAME = "youtube"
 YOUTUBE_API_VERSION = "v3"
 # creating Youtube Resource Object 
@@ -38,6 +41,32 @@ def multiple_video_details(ids):
     videos = [] 
     max_views = 0
     ret_result = ''
+    # getting stats of video with maximum views
+    for result in results: 
+        views = 0
+        try:
+            views = int(result['statistics']['viewCount'])
+        except Exception as e:
+            print("Exception while getting viewCount")
+        if views > max_views:
+            max_views = views
+            ret_result = result
+    return ret_result
+
+def video_details(videoid):    
+    # Call the videos.list method 
+    # to retrieve video info 
+    list_videos_byid = youtube.videos().list( 
+             id = videoid, 
+      part = "id, statistics", 
+                                  ).execute() 
+ # extracting the results from search response 
+    results = list_videos_byid.get("items", [])
+    # empty list to store video details 
+    videos = [] 
+    max_views = 0
+    ret_result = ''
+    # getting stats of video with maximum views
     for result in results: 
         views = 0
         try:
@@ -52,7 +81,7 @@ def multiple_video_details(ids):
 def youtube_search_keyword(query, max_results):        
     # calling the search.list method to 
     # retrieve youtube search results 
-    search_keyword = youtube_object.search().list(q = query, part = "id, snippet", 
+    search_keyword = youtube_object.search().list(q = query, part = "id", 
                                                maxResults = max_results).execute() 
     # extracting the results from search response 
     results = search_keyword.get("items", []) 
@@ -65,23 +94,38 @@ def youtube_search_keyword(query, max_results):
     stats = multiple_video_details(",".join(video_ids))  
     return stats
     
-def youtube_api_call(row):   
+def youtube_api_search_call(row):   
     views = likes = dislikes = 0
-    stats = youtube_search_keyword(str(row['searchby']),  max_results = 5)
+    stats = []
     try:
+        stats = youtube_search_keyword(str(row['searchby']),  max_results = 2)
         views = stats['statistics']['viewCount']
         likes = stats['statistics']['likeCount']
         dislikes =  stats['statistics']['dislikeCount']
     except Exception as e:
-        print(e)   
+        views = 0   
+    return row['tmdb_id'], views, likes, dislikes
+    
+def youtube_api_videoid_call(row):
+    views = likes = dislikes = 0
+    stats = []
+    try:
+        stats = video_details(str(row['youtubeId']))
+        views = stats['statistics']['viewCount']
+        likes = stats['statistics']['likeCount']
+        dislikes =  stats['statistics']['dislikeCount']
+    except Exception as e:
+        views = 0   
     return row['tmdb_id'], views, likes, dislikes
     
 def main(input_directory, output_directory):
     #remove null values for budget and revenue and split data into train/validation and test
     data = spark.read.parquet(input_directory + "/movies_aggregated_data.parquet")
+    video_id_data = spark.read.option("header",True).csv(input_directory + '/ml-youtube.csv')
     data = data.where(data['budget'].isNotNull() & data['revenue'].isNotNull() & data['runtime'].isNotNull() & data['title'].isNotNull() & data['release_date'].isNotNull() & data['imdb_id'].isNotNull())
-    df = data.select("tmdb_id", concat(col("title"), lit(" "), year(col("release_date")), lit(" trailer")).alias('searchby'))
-    result = df.rdd.map(youtube_api_call)
+    df = data.select("tmdb_id", concat(col("title"), lit(" ("), year(col("release_date")), lit(")")).alias('title'))
+    joined =  df.join(video_id_data, on=['title'], how='inner')
+    result = joined.rdd.map(youtube_api_videoid_call)
     result_df = spark.createDataFrame(data=result, schema=youtube_schema)
     result_df.write.mode('overwrite').parquet(output_directory + "/youtube_data.parquet")
 
