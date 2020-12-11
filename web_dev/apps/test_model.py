@@ -8,8 +8,6 @@ spark.sparkContext.setLogLevel('WARN')
 from pyspark.ml.tuning import TrainValidationSplitModel
 from pyspark.ml import PipelineModel
 
-import datetime
-
 
 def test_model():
     # get the data
@@ -17,7 +15,7 @@ def test_model():
     sc_df = spark.createDataFrame(Row(**i) for i in [temp_res])
     sc_df.show()
     # load the model
-    model = PipelineModel.load('./150_depth_4/bestModel')    
+    model = PipelineModel.load('./best_model/bestModel')    
     # use the model to make predictions
     predictions = model.transform(test_tomorrow)
     predictions.show()

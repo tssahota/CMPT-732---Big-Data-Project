@@ -3,51 +3,44 @@ import dash_html_components as html
 from dash.dependencies import Input, Output
 import dash_bootstrap_components as dbc
 from datetime import datetime
-#from pyspark.sql import SparkSession, Row
+from app_temp import app
 from pyspark import SparkConf, SparkContext
 from pyspark.sql import SparkSession, Row
-from app_temp import app
-from pyspark.ml import PipelineModel
-from pyspark.ml.evaluation import RegressionEvaluator
-from pyspark.ml import Pipeline
-from pyspark.ml.feature import VectorAssembler, SQLTransformer
-from pyspark.ml.regression import LinearRegression, GBTRegressor, GBTParams, GBTRegressionModel, GeneralizedLinearRegression, DecisionTreeRegressor
 from pyspark.ml.tuning import TrainValidationSplitModel
 
 conf = SparkConf().setAppName("PySpark App").set("spark.driver.allowMultipleContexts", "true").setMaster("local")
 sc = SparkContext(conf=conf)
 spark = SparkSession.builder.appName("ui").getOrCreate()
-model = TrainValidationSplitModel.read().load('./apps/best_model')
-#model = PipelineModel.load('./apps/150_depth_4/')
+model = TrainValidationSplitModel.read().load('/home/ericflyfly/Desktop/CMPT732 Big Data lab1/CMPT-732---Big-Data-Project/web_dev/apps/best_model/')
 
 #spark = SparkSession.builder.appName("task").getOrCreate()
 #spark.driver.allowMultipleContexts = True
 
-director_options=[
-        {'label': 'New York City', 'value': 'NYC'},
-        {'label': 'Montreal', 'value': 'MTL'},
-        {'label': 'San Francisco', 'value': 'SF'},
-        {'label': 'adsfasdfasdf', 'value': 'Sd'},
-        {'label': 'sgdfgdgfgadssasd', 'value': 'Sg'},]
+# director_options=[
+#         {'label': 'New York City', 'value': 'NYC'},
+#         {'label': 'Montreal', 'value': 'MTL'},
+#         {'label': 'San Francisco', 'value': 'SF'},
+#         {'label': 'adsfasdfasdf', 'value': 'Sd'},
+#         {'label': 'sgdfgdgfgadssasd', 'value': 'Sg'},]
 
-genre_options=[
-    {'label': 'New York City', 'value': 'NYC'},
-    {'label': 'Montreal', 'value': 'MTL'},
-    {'label': 'San Francisco', 'value': 'SF'},
-    {'label': 'adsfasdfasdf', 'value': 'Sd'},
-    {'label': 'sgdfgdgfgadssasd', 'value': 'Sg'},
-]
+# genre_options=[
+#     {'label': 'New York City', 'value': 'NYC'},
+#     {'label': 'Montreal', 'value': 'MTL'},
+#     {'label': 'San Francisco', 'value': 'SF'},
+#     {'label': 'adsfasdfasdf', 'value': 'Sd'},
+#     {'label': 'sgdfgdgfgadssasd', 'value': 'Sg'},
+# ]
 
-cast_options=[
-    {'label': 'New York City', 'value': 'NYC'},
-    {'label': 'Montreal', 'value': 'MTL'},
-    {'label': 'San Francisco', 'value': 'SF'},
-    {'label': 'adsfasdfasdf', 'value': 'Sd'},
-    {'label': 'sgdfgdgfgadssasd', 'value': 'Sg'},
-]
+# cast_options=[
+#     {'label': 'New York City', 'value': 'NYC'},
+#     {'label': 'Montreal', 'value': 'MTL'},
+#     {'label': 'San Francisco', 'value': 'SF'},
+#     {'label': 'adsfasdfasdf', 'value': 'Sd'},
+#     {'label': 'sgdfgdgfgadssasd', 'value': 'Sg'},
+# ]
 
 #features = ['budget', 'genre', 'director', 'cast', 'runtime', 'release_date']
-features = ['budget', 'vote_average', 'vote_count','popularity', 'runtime', 'release_date']
+features = ['budget', 'vote_count','popularity', 'keyword_power', 'youtube_views', 'youtube_likes']
 
 layout = html.Div([
     html.Div(id='predictor_container', children=[
@@ -60,21 +53,21 @@ layout = html.Div([
                         id="budget",
                         placeholder="Budget",
                         type='number',
-                        min=0,
+                        min=1,
                         style={'width': '100%'}
                     ),
                 ]),
-                html.Div(children=[
-                    html.Label('Vote Average'),
-                    dbc.Input(
-                        id="vote_average",
-                        placeholder="Vote Average",
-                        type='number',
-                        min=0,
-                        max=5,
-                        style={'width': '100%'}
-                    ),
-                ], style={'margin-top': '5px'}),
+                # html.Div(children=[
+                #     html.Label('Vote Average'),
+                #     dbc.Input(
+                #         id="vote_average",
+                #         placeholder="Vote Average",
+                #         type='number',
+                #         min=0,
+                #         max=5,
+                #         style={'width': '100%'}
+                #     ),
+                # ], style={'margin-top': '5px'}),
                 html.Div(children=[
                     html.Label('Vote Count'),
                     dbc.Input(
@@ -90,6 +83,36 @@ layout = html.Div([
                     dbc.Input(
                         id="popularity",
                         placeholder="Popularity",
+                        type='number',
+                        min=0,
+                        style={'width': '100%'}
+                    ),
+                ], style={'margin-top': '5px'}),
+                html.Div(children=[
+                    html.Label('Keyword Power'),
+                    dbc.Input(
+                        id="keyword_power",
+                        placeholder="Keyword Power",
+                        type='number',
+                        min=0,
+                        style={'width': '100%'}
+                    ),
+                ], style={'margin-top': '5px'}),
+                html.Div(children=[
+                    html.Label('Youtube Views'),
+                    dbc.Input(
+                        id="youtube_views",
+                        placeholder="Youtube Views",
+                        type='number',
+                        min=0,
+                        style={'width': '100%'}
+                    ),
+                ], style={'margin-top': '5px'}),
+                html.Div(children=[
+                    html.Label('Youtube Likes'),
+                    dbc.Input(
+                        id="youtube_likes",
+                        placeholder="Youtube Likes",
                         type='number',
                         min=0,
                         style={'width': '100%'}
@@ -122,25 +145,24 @@ layout = html.Div([
                 #         multi=True,
                 #     )
                 # ], style={'margin-top': '5px'}),
+                # html.Div(children=[
+                #     html.Label('Run Time'),
+                #     dbc.Input(
+                #         id="runtime",
+                #         placeholder="run time",
+                #         type='number',
+                #         min=0,
+                #         style={'width': '100%'}
+                #     ),
+                # ], style={'margin-top': '5px'}),
+                # html.Label('Planned Release Date', style={'width': '100%'}),
+                #     dcc.DatePickerSingle(
+                #         id="release_date",
+                #         clearable=True,
+                #         with_portal=True,
+                #         display_format='MMM D YYYY',
+                #     ),
                 html.Div(children=[
-                    html.Label('Run Time'),
-                    dbc.Input(
-                        id="runtime",
-                        placeholder="run time",
-                        type='number',
-                        min=0,
-                        style={'width': '100%'}
-                    ),
-                ], style={'margin-top': '5px'}),
-                html.Div(children=[
-                    html.Label('Planned Release Date', style={'width': '100%'}),
-                    dcc.DatePickerSingle(
-                        id="release_date",
-                        clearable=True,
-                        with_portal=True,
-                        display_format='MMM D YYYY',
-                    ),
-                    dbc.Button("Predict", id="predict_btn", color="primary", className="ml-5 float-right"),
                 ], style={'margin-top': '5px'}),
                 html.Div(id='result_div', children=[
                     html.Label('Prediction'),
@@ -154,7 +176,7 @@ layout = html.Div([
                     ),
                         ],
                     ),
-
+                    dbc.Button("Predict", id="predict_btn", color="primary", className="ml-5 float-right")
                 ], style={'margin-top': '15px'}),
             ], className="col-md-8"),
             html.Div(id='predictor_p', children=[
@@ -202,36 +224,37 @@ layout = html.Div([
 #         return [option for option in cast_options if option["value"] in values]
 #     else:
 #         return cast_options
+features = ['budget', 'vote_count','popularity', 'keyword_power', 'youtube_views', 'youtube_likes']
 
 @app.callback(
     Output(component_id="predict_result", component_property="value"),
     [Input(component_id="budget", component_property="value"),
-    Input(component_id="vote_average", component_property="value"),
-    Input(component_id="vote_count", component_property="value"), 
-    Input(component_id="popularity", component_property="value"),
-    Input(component_id="runtime", component_property="value"),
-    Input(component_id="release_date", component_property="date"),
+    Input(component_id="vote_count", component_property="value"),
+    Input(component_id="popularity", component_property="value"), 
+    Input(component_id="keyword_power", component_property="value"),
+    Input(component_id="youtube_views", component_property="value"),
+    Input(component_id="youtube_likes", component_property="value"),
     Input("predict_btn", "n_clicks")
     ],
 )
-def predict_features(budget, vote_average, vote_count, popularity, runtime, release_date, n):
+def predict_features(budget, vote_count,popularity, keyword_power, youtube_views, youtube_likes, n):
     # if release_date is not None:
     #     date_object = date.fromisoformat(release_date)
     #     date_string = date_object.strftime('%B %d, %Y')
     #     print (string_prefix + date_string)
     if n:
         features_res = {}
-        temp = [budget, vote_average, vote_count, popularity, runtime, release_date]
+        temp = [budget, vote_count,popularity, keyword_power, youtube_views, youtube_likes]
         for i, feature in enumerate(features):
-            if i == len(temp)-1:
-                #print(temp[i])
-                features_res[feature] = datetime.strptime(temp[i], '%Y-%m-%d').timetuple().tm_yday
-            else: 
+            # if i == len(temp)-1:
+            #     #print(temp[i])
+            #     features_res[feature] = datetime.strptime(temp[i], '%Y-%m-%d').timetuple().tm_yday
+            # else: 
                 features_res[feature] = temp[i]
         print(features_res)
         temp_res = {'budget': 100, 'vote_count': 100, 'popularity': 100, 'collection': True}
-        sc_df = spark.createDataFrame(Row(**i) for i in [temp_res])
-        sc_df.show()
+        # sc_df = spark.createDataFrame(Row(**i) for i in [temp_res])
+        # sc_df.show()
 
         #predictions = model.transform(sc_df)
         #predictions.show()
