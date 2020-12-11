@@ -43,29 +43,25 @@ def main(inputs, output):
 
     #Calculate cast_power, director_power, producer_power, keyword_power features
     cast_temp = pred_revenue.select(pred_revenue['*'], functions.explode(pred_revenue['cast_ids']).alias('cast_split'))
-    cast_power = cast_temp.groupBy('cast_split').agg(functions.avg(cast_temp['revenue']).alias('cast_power'),\
-                                                     functions.count(cast_temp['revenue']).alias('count'))
+    cast_power = cast_temp.groupBy('cast_split').agg(functions.avg(cast_temp['profit']).alias('cast_power'))
     cast_power.cache()
     cast_temp = cast_temp.join(cast_power, cast_temp['cast_split']==cast_power['cast_split'], 'left').distinct()
     cast_join = cast_temp.groupBy('tmdb_id').agg(functions.avg(cast_temp['cast_power']).alias('cast_power'))
     
     director_temp = pred_revenue.select(pred_revenue['*'], functions.explode(pred_revenue['director_ids']).alias('director_split'))
-    director_power = director_temp.groupBy('director_split').agg(functions.avg(director_temp['revenue']).alias('director_power'), \
-                                                                 functions.count(director_temp['revenue']).alias('count'))
+    director_power = director_temp.groupBy('director_split').agg(functions.avg(director_temp['profit']).alias('director_power'))
     director_power.cache()
     director_temp = director_temp.join(director_power, director_temp['director_split']==director_power['director_split'], 'left').distinct()
     director_join = director_temp.groupBy('tmdb_id').agg(functions.avg(director_temp['director_power']).alias('director_power'))
     
     producer_temp = pred_revenue.select(pred_revenue['*'], functions.explode(pred_revenue['producer_ids']).alias('producer_split'))
-    producer_power = producer_temp.groupBy('producer_split').agg(functions.avg(producer_temp['revenue']).alias('producer_power'), \
-                                                                 functions.count(producer_temp['revenue']).alias('count'))
+    producer_power = producer_temp.groupBy('producer_split').agg(functions.avg(producer_temp['profit']).alias('producer_power'))
     producer_power.cache()
     producer_temp = producer_temp.join(producer_power, producer_temp['producer_split']==producer_power['producer_split'], 'left').distinct()
     producer_join = producer_temp.groupBy('tmdb_id').agg(functions.avg(producer_temp['producer_power']).alias('producer_power'))
     
     keyword_temp = pred_revenue.select(pred_revenue['*'], functions.explode(pred_revenue['keyword_ids']).alias('keyword_split'))
-    keyword_power = keyword_temp.groupBy('keyword_split').agg(functions.avg(keyword_temp['revenue']).alias('keyword_power'), \
-                                                              functions.count(keyword_temp['revenue']).alias('count'))
+    keyword_power = keyword_temp.groupBy('keyword_split').agg(functions.avg(keyword_temp['profit']).alias('keyword_power'))
     keyword_power.cache()
     keyword_temp = keyword_temp.join(keyword_power, keyword_temp['keyword_split']==keyword_power['keyword_split'], 'left').distinct()
     keyword_join = keyword_temp.groupBy('tmdb_id').agg(functions.avg(keyword_temp['keyword_power']).alias('keyword_power'))
@@ -75,6 +71,8 @@ def main(inputs, output):
     pred_revenue = pred_revenue.join(producer_join, pred_revenue['tmdb_id']==producer_join['tmdb_id'], 'left').select(pred_revenue['*'], producer_join['producer_power'])  
     pred_revenue = pred_revenue.join(keyword_join, pred_revenue['tmdb_id']==keyword_join['tmdb_id'], 'left').select(pred_revenue['*'], keyword_join['keyword_power']) #.distinct()
     
+    cast.cache()
+    crew.cache()
     print("New pred_revenue count:", pred_revenue.count())
     print("New cast count:", cast.count())
     print("New crew count:", crew.count())
@@ -87,12 +85,19 @@ def main(inputs, output):
 
 
     #write files
-    cast_power.write.mode('overwrite').parquet(input_dir + "/cast_power.parquet") 
-    director_power.write.mode('overwrite').parquet(input_dir + "/director_power.parquet") 
+    cast = cast.join(cast_power, cast['cast_id']==cast_power['cast_split'], 'left').select(cast['*'], cast_power['cast_power'])
+    cast.write.mode('overwrite').parquet(input_dir + "/cast_details.parquet") 
+    crew = crew.join(director_power, [crew['crew_id']==director_power['director_split'], crew['crew_job'] == 'Director'], 'left').select(crew['*'], director_power['director_power'].alias('crew_power'))
+    crew = crew.join(producer_power, [crew['crew_id']==producer_power['producer_split'], crew['crew_job'] == 'Producer'], 'left').select(crew['*'], producer_power['producer_power']) 
+    crew = crew.withColumn("crew_power_new", functions.when(crew['crew_power'].isNotNull(), crew['crew_power']).otherwise(crew['producer_power'])) \
+              .drop('crew_power','producer_power').withColumnRenamed("crew_power_new", "crew_power") 
+    crew.write.mode('overwrite').parquet(input_dir + "/crew_details.parquet") 
 
     #cast.where(cast['cast_power'].isNotNull()).show(3)
     #crew.where(crew['crew_power'].isNotNull()).show(3)
     
+    #save complete data
+    pred_revenue.write.mode('overwrite').parquet(output_dir + "/pred_revenue.parquet") 
     train, test = pred_revenue.randomSplit([0.90, 0.10]) 
     #save the train file
     train.write.mode('overwrite').parquet(output_dir + "/pred_revenue_train.parquet") 
