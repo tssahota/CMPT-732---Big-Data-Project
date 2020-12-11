@@ -30,7 +30,8 @@ feature_engineering.py
 /spark-submit feature_engineering.py <processed_data_directory> <training_data_directory>
 
 # eric_analysis.py
-spark-submit eric_analysis.py
+spark-submit eric_analysis.py <input_directory> <output_directory>
+Recommended: spark-submit eric_analysis.py Processed_Data/ web-dev/apps/analysis_data/
 
 # eric_ui.py
 python eric_ui.py
@@ -40,6 +41,8 @@ pip install pandas
 pip install dash
 pip install pyarrow
 pip install dash-bootstrap-components
+pip install iso3166
+pip install wordcloud
 
 cd web_dev
 python main.py

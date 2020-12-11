@@ -53,7 +53,7 @@ task10_fig = px.choropleth(task10_df, locations="iso_alpha",
                     color="count",
                     hover_name="country", # column to add to hover information
                     hover_data=["country_id", "count"],
-                    template="plotly_white", color_continuous_scale=colorscale)
+                    template="plotly_white", color_continuous_scale=colorscale, range_color=(0, 400))
 
 layout = html.Div([
     html.Div(id='task8_container', children=[
