@@ -47,7 +47,7 @@ $pip install iso3166
 
 ## 3. Run Dash App
 ```
-$python app.py
+$spark-submit app.py
 ```
 ###### Notes
 * Tested with python==3.6.0 in Anaconda virtual environment.
