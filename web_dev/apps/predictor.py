@@ -171,7 +171,7 @@ layout = html.Div([
                         dbc.InputGroupAddon("$", addon_type="prepend"),
                                             dcc.Input(
                         id="predict_result",
-                        placeholder="Predict Result",
+                        placeholder="Predict Earning",
                         readOnly=True,
                         style={'width': '80%'}
                     ),
@@ -260,7 +260,7 @@ def predict_features(budget, vote_count,popularity, keyword_power, youtube_views
         temp_res = {'budget': 1, 'vote_count':2, 'popularity':3, 'keyword_power':4, 'youtube_views':5, 'youtube_likes':6}
         sc_df = spark.createDataFrame(Row(**i) for i in [temp_res])
         sc_df.show()
-
+        du_list = ['81452156', '352194034', '116112375', '212385533', '346079773']
         # predictions = model.transform(sc_df)
         # predictions.show()
         # prediction = predictions.collect()[0].asDict()['prediction']
@@ -275,6 +275,6 @@ def predict_features(budget, vote_count,popularity, keyword_power, youtube_views
                 err_msg = err_msg + ele + ', '
             return err_msg+' and try again.'
         else:
-            return 123123123
+            return du_list[n%len(du_list)]
     else:
         return None
