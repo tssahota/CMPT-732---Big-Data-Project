@@ -57,10 +57,7 @@ layout = html.Div([
             html.Div(id='task2_p', children=[
                 html.P(
                     id="task2_insight",
-                    children="† Deaths are classified using the International Classification of Diseases, \
-                    Tenth Revision (ICD–10). Drug-poisoning deaths are defined as having ICD–10 underlying \
-                    cause-of-death codes X40–X44 (unintentional), X60–X64 (suicide), X85 (homicide), or Y10–Y14 \
-                    (undetermined intent).",
+                    children="Genre with highest average parameter each year. Profit shows a clear increasing trend. However, there appears to be no significant temporal trends for popularity, avg_user_rating and critic's rating.",
                 ),
             ], className="col-md-8"),
         ], className="row"),
@@ -72,10 +69,7 @@ layout = html.Div([
         html.Div(id='task19_p', children=[
                 html.P(
                     id="task19_insight",
-                    children="† Deaths are classified using the International Classification of Diseases, \
-                    Tenth Revision (ICD–10). Drug-poisoning deaths are defined as having ICD–10 underlying \
-                    cause-of-death codes X40–X44 (unintentional), X60–X64 (suicide), X85 (homicide), or Y10–Y14 \
-                    (undetermined intent).",
+                    children="Temporal trends of each continuous quantitative parameter. Budget and revenue seem to increase consistently with progression of time. However, critics seem to prefer movies before the 80s, which could be just due to the low vote_count for movies release before the internet. Any significant temporal trends are absent for other variables.",
                 ),
         ]),
         html.Div(id='task19_sub', children=[

@@ -78,10 +78,7 @@ layout = html.Div([
             html.Div(id='task1_p', children=[
                 html.P(
                     id="task1_insight",
-                    children="† Deaths are classified using the International Classification of Diseases, \
-                    Tenth Revision (ICD–10). Drug-poisoning deaths are defined as having ICD–10 underlying \
-                    cause-of-death codes X40–X44 (unintentional), X60–X64 (suicide), X85 (homicide), or Y10–Y14 \
-                    (undetermined intent).",
+                    children="List of Top 10 movies with the highest selected parameter for any year",
                 ),
             ], className="col-md-8"),
         ], className="row"),
@@ -110,10 +107,7 @@ layout = html.Div([
             html.Div(id='task3_p', children=[
                 html.P(
                     id="task3_insight",
-                    children="† Deaths are classified using the International Classification of Diseases, \
-                    Tenth Revision (ICD–10). Drug-poisoning deaths are defined as having ICD–10 underlying \
-                    cause-of-death codes X40–X44 (unintentional), X60–X64 (suicide), X85 (homicide), or Y10–Y14 \
-                    (undetermined intent).",
+                    children="List of Top 10 movies with the highest selected parameter for any genre.",
                 ),
             ], className="col-md-8"),
         ], className="row"),
@@ -135,10 +129,7 @@ layout = html.Div([
             html.Div(id='task4_p', children=[
                 html.P(
                     id="task4_insight",
-                    children="† Deaths are classified using the International Classification of Diseases, \
-                    Tenth Revision (ICD–10). Drug-poisoning deaths are defined as having ICD–10 underlying \
-                    cause-of-death codes X40–X44 (unintentional), X60–X64 (suicide), X85 (homicide), or Y10–Y14 \
-                    (undetermined intent).",
+                    children="List of Top 10 production companies with the highest selected parameter.",
                 ),
             ], className="col-md-8"),
         ], className="row"),
@@ -167,10 +158,7 @@ layout = html.Div([
             html.Div(id='task16_p', children=[
                 html.P(
                     id="task16_insight",
-                    children="† Deaths are classified using the International Classification of Diseases, \
-                    Tenth Revision (ICD–10). Drug-poisoning deaths are defined as having ICD–10 underlying \
-                    cause-of-death codes X40–X44 (unintentional), X60–X64 (suicide), X85 (homicide), or Y10–Y14 \
-                    (undetermined intent).",
+                    children="List of Top 10 actors/directors with the highest average revenue generated.",
                 ),
             ], className="col-md-8"),
         ], className="row"),
@@ -190,7 +178,7 @@ layout = html.Div([
 )
 def update_graph(slct_year, slct_col):
     print('task1 update', slct_year, slct_col)
-    container = f"Top 10 {col_label[slct_col]} Movies in {slct_year}"
+    container = f"Top 10 Highest {col_label[slct_col]} Movies in {slct_year}"
     dff = df["task1"].copy()
     #filter col
     dff = dff[dff["year"] == slct_year].sort_values(by=slct_col, ascending=False).head(10).sort_values(by=slct_col, ascending=True)
@@ -215,7 +203,7 @@ def update_graph(slct_year, slct_col):
 )
 def update_graph(slct_genre, slct_col):
     print('task3 update', slct_genre, slct_col)
-    container = f"Top 10 {col_label[slct_col]} Movies in {slct_genre} (2000-2017)"
+    container = f"Top 10 Highest {col_label[slct_col]} Movies in {slct_genre} (2000-2017)"
     dff = df["task3"].copy()
     #filter col
     dff = dff[dff["genre_name"] == slct_genre].sort_values(by=slct_col, ascending=False).head(10).sort_values(by=slct_col, ascending=True)
@@ -236,7 +224,7 @@ def update_graph(slct_genre, slct_col):
 )
 def update_graph(slct_col):
     print('task4 update')
-    container = f"Top 10 {col_label[slct_col]} Production Companies of all-time"
+    container = f"Top 10 Highest {col_label[slct_col]} Production Companies of All Time"
     dff = df["task4"].copy()
     #filter col
     dff = dff.sort_values(by=slct_col, ascending=False).head(10).sort_values(by=slct_col, ascending=True)
@@ -257,7 +245,7 @@ def update_graph(slct_col):
 )
 def update_graph(slct_job):
     print('task16 update', slct_job)
-    container = f"Top 10 Average Revenue {slct_job}s of All Time"
+    container = f"Top 10 Highest Average Revenue Generating {slct_job}s of All Time"
     dff = df["task16"].copy()
     #filter col
     dff = dff[dff["job"] == slct_job].sort_values(by='avg_revenue', ascending=False).head(10).sort_values(by='avg_revenue', ascending=True)

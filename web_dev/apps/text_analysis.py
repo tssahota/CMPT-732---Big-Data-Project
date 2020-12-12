@@ -158,10 +158,7 @@ layout = html.Div([
         html.Div(id='task6_p', children=[
             html.P(
                 id="task6_insight",
-                children="† Deaths are classified using the International Classification of Diseases, \
-                Tenth Revision (ICD–10). Drug-poisoning deaths are defined as having ICD–10 underlying \
-                cause-of-death codes X40–X44 (unintentional), X60–X64 (suicide), X85 (homicide), or Y10–Y14 \
-                (undetermined intent).",
+                children="Love, Day, Man and Girl seem to be the most frequent words used in movie titles.",
             ),
         ]),
         dcc.Graph(figure=fig6, style={"margin": "auto", "width" : '90%'})
@@ -172,10 +169,7 @@ layout = html.Div([
         html.Div(id='task7_p', children=[
             html.P(
                 id="task7_insight",
-                children="† Deaths are classified using the International Classification of Diseases, \
-                Tenth Revision (ICD–10). Drug-poisoning deaths are defined as having ICD–10 underlying \
-                cause-of-death codes X40–X44 (unintentional), X60–X64 (suicide), X85 (homicide), or Y10–Y14 \
-                (undetermined intent).",
+                children="Woman Director,independent film and murder seem to be the most frequent keywords associated with movies which give us insight into themes the publishers think would be profitable to push.",
             ),
         ]),
         dcc.Graph(figure=fig7, style={"margin": "auto", "width" : '90%'})
