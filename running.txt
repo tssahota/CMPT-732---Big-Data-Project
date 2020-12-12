@@ -1,0 +1,47 @@
+Dash UI 
+$cd web_dev
+$pip install pandas
+$pip install dash
+$pip install pyarrow
+$pip install dash-bootstrap-components
+$pip install Pillow
+$pip install iso3166
+$spark-submit app.py
+
+ETL_movie_metadata.py: spark-submit ETL_movie_metadata.py movies_metadata.csv <output_directory> overwrite
+Eg: spark-submit Data_Cleaning/ETL_movie_metadata.py Raw_Datasets/movies_metadata.csv Processed_Data overwrite
+
+ETL_movieid_links.py: spark-submit ETL_movieid_links.py links.csv <output_directory> overwrite
+ETL_user_ratings.py spark-submit ETL_user_ratings.py ratings.csv <output_directory> overwrite
+
+ETL_keywords.py spark-submit ETL_keywords.py keywords.csv <output_directory> overwrite
+
+ETL_credits.py spark-submit ETL_credits.py credits.csv <output_directory> overwrite
+
+YouTube API
+$spark-submit YouTube.py <input_dir> <output_dir> 
+$spark-submit YouTube.py /Users/harman/Documents/CMPT-732---Big-Data-Project/Processed_Data /Users/harman/Documents/CMPT-732---Big-Data-Project/Processed_Data
+
+Feature Engineering
+$spark-submit feature_engineering.py <input_dir_> <output_dir>
+$spark-submit feature_engineering.py /Users/harman/Documents/CMPT-732---Big-Data-Project/Processed_Data /Users/harman/Documents/CMPT-732---Big-Data-Project/Processed_Data
+
+Feature Selection 
+$spark-submit feature_selection.py <input_dir_> <output_dir>
+$spark-submit feature_selection.py /Users/harman/Documents/CMPT-732---Big-Data-Project/Processed_Data /Users/harman/Documents/CMPT-732---Big-Data-Project/Processed_Data
+
+Outlier Removal
+$spark-submit feature_selection.py <input_dir_> <output_dir>
+$spark-submit feature_selection.py /Users/harman/Documents/CMPT-732---Big-Data-Project/Predictor/ /Users/harman/Documents/CMPT-732---Big-Data-Project/Predictor/
+
+Prediction
+$spark-submit prediction_train.py <input_dir_> <output_dir>
+$spark-submit prediction_train.py /Users/harman/Documents/CMPT-732---Big-Data-Project/Predictor/ /Users/harman/Documents/CMPT-732---Big-Data-Project/Predictor/
+
+Upload to S3 (Only work if you have valid AWS credentials)
+$python upload_to_s3.py /Users/harman/Documents/CMPT-732---Big-Data-Project/Predictor/boxplots.png boxplots sagemaker-studio-lrp9p38z5a9 0
+
+
+
+
+
