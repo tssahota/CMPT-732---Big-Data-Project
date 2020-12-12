@@ -2,16 +2,17 @@ import dash_core_components as dcc
 import dash_html_components as html
 from dash.dependencies import Input, Output
 import dash_bootstrap_components as dbc
-from datetime import datetime
 from app_temp import app
+# from datetime import datetime
 from pyspark import SparkConf, SparkContext
 from pyspark.sql import SparkSession, Row
-from pyspark.ml.tuning import TrainValidationSplitModel
+from pyspark.ml import PipelineModel
+
 
 conf = SparkConf().setAppName("PySpark App").set("spark.driver.allowMultipleContexts", "true").setMaster("local")
 sc = SparkContext(conf=conf)
 spark = SparkSession.builder.appName("ui").getOrCreate()
-model = TrainValidationSplitModel.read().load('/home/ericflyfly/Desktop/CMPT732 Big Data lab1/CMPT-732---Big-Data-Project/web_dev/apps/best_model/')
+model = PipelineModel.load('./apps/best_model/bestModel')
 
 #spark = SparkSession.builder.appName("task").getOrCreate()
 #spark.driver.allowMultipleContexts = True
@@ -171,8 +172,8 @@ layout = html.Div([
                                             dcc.Input(
                         id="predict_result",
                         placeholder="Predict Result",
-                        type='number',
                         readOnly=True,
+                        style={'width': '80%'}
                     ),
                         ],
                     ),
@@ -244,26 +245,36 @@ def predict_features(budget, vote_count,popularity, keyword_power, youtube_views
     #     print (string_prefix + date_string)
     if n:
         features_res = {}
-        temp = [budget, vote_count,popularity, keyword_power, youtube_views, youtube_likes]
+        temp = [budget, vote_count, popularity, keyword_power, youtube_views, youtube_likes]
+        label = ['Budget', 'Vote Count', 'Popularity', 'Keyword Power', 'Youtube Views', 'Youtube Likes']
+        mis_list = []
         for i, feature in enumerate(features):
             # if i == len(temp)-1:
             #     #print(temp[i])
             #     features_res[feature] = datetime.strptime(temp[i], '%Y-%m-%d').timetuple().tm_yday
-            # else: 
-                features_res[feature] = temp[i]
+            # else:
+            if temp[i] == None:
+                mis_list.append(label[i])
+            features_res[feature] = temp[i]
         print(features_res)
-        temp_res = {'budget': 100, 'vote_count': 100, 'popularity': 100, 'collection': True}
-        # sc_df = spark.createDataFrame(Row(**i) for i in [temp_res])
-        # sc_df.show()
+        temp_res = {'budget': 1, 'vote_count':2, 'popularity':3, 'keyword_power':4, 'youtube_views':5, 'youtube_likes':6}
+        sc_df = spark.createDataFrame(Row(**i) for i in [temp_res])
+        sc_df.show()
 
-        #predictions = model.transform(sc_df)
-        #predictions.show()
+        # predictions = model.transform(sc_df)
+        # predictions.show()
         # prediction = predictions.collect()[0].asDict()['prediction']
 
         #spark_df = spark.createDataFrame([Row(features_res)])
         #print(spark_df.schema)
         #spark_df.show()
         #update predict result
-        return 1000000000000000000034597839459835798345
+        if mis_list:
+            err_msg = 'Error: Please fill in '
+            for ele in mis_list:
+                err_msg = err_msg + ele + ', '
+            return err_msg+' and try again.'
+        else:
+            return 123123123
     else:
         return None
