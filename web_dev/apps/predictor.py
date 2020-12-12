@@ -13,7 +13,7 @@ conf = SparkConf().setAppName("PySpark App").set("spark.driver.allowMultipleCont
 sc = SparkContext(conf=conf)
 spark = SparkSession.builder.appName("ui").getOrCreate()
 model = PipelineModel.load('./apps/best_model/bestModel')
-
+last_pred = 0
 #spark = SparkSession.builder.appName("task").getOrCreate()
 #spark.driver.allowMultipleContexts = True
 
@@ -42,6 +42,7 @@ model = PipelineModel.load('./apps/best_model/bestModel')
 
 #features = ['budget', 'genre', 'director', 'cast', 'runtime', 'release_date']
 features = ['budget', 'vote_count','popularity', 'keyword_power', 'youtube_views', 'youtube_likes']
+last_n = 0
 
 layout = html.Div([
     html.Div(id='predictor_container', children=[
@@ -166,7 +167,7 @@ layout = html.Div([
                 html.Div(children=[
                 ], style={'margin-top': '5px'}),
                 html.Div(id='result_div', children=[
-                    html.Label('Prediction'),
+                    html.Label('Box Office Prediction', style={'color': '#008CBA'}),
                     dbc.InputGroup([
                         dbc.InputGroupAddon("$", addon_type="prepend"),
                                             dcc.Input(
@@ -243,38 +244,42 @@ def predict_features(budget, vote_count,popularity, keyword_power, youtube_views
     #     date_object = date.fromisoformat(release_date)
     #     date_string = date_object.strftime('%B %d, %Y')
     #     print (string_prefix + date_string)
+    global last_pred 
+    global last_n
+    print('n here', n, last_n)
     if n:
-        features_res = {}
-        temp = [budget, vote_count, popularity, keyword_power, youtube_views, youtube_likes]
-        label = ['Budget', 'Vote Count', 'Popularity', 'Keyword Power', 'Youtube Views', 'Youtube Likes']
-        mis_list = []
-        for i, feature in enumerate(features):
-            # if i == len(temp)-1:
-            #     #print(temp[i])
-            #     features_res[feature] = datetime.strptime(temp[i], '%Y-%m-%d').timetuple().tm_yday
-            # else:
-            if temp[i] == None:
-                mis_list.append(label[i])
-            features_res[feature] = temp[i]
-        print(features_res)
-        temp_res = {'budget': 1, 'vote_count':2, 'popularity':3, 'keyword_power':4, 'youtube_views':5, 'youtube_likes':6}
-        sc_df = spark.createDataFrame(Row(**i) for i in [temp_res])
-        sc_df.show()
-        du_list = ['81452156', '352194034', '116112375', '212385533', '346079773']
-        # predictions = model.transform(sc_df)
-        # predictions.show()
-        # prediction = predictions.collect()[0].asDict()['prediction']
+        if n - 1 == last_n:
+            last_n = n
+            print('udpate n here', n, last_n)
+            features_res = {'revenue':7, 'collection':8}
+            temp = [budget, vote_count, popularity, keyword_power, youtube_views, youtube_likes]
+            label = ['Budget', 'Vote Count', 'Popularity', 'Keyword Power', 'Youtube Views', 'Youtube Likes']
+            mis_list = []
+            for i, feature in enumerate(features):
+                # if i == len(temp)-1:
+                #     #print(temp[i])
+                #     features_res[feature] = datetime.strptime(temp[i], '%Y-%m-%d').timetuple().tm_yday
+                # else:
+                if temp[i] == None:
+                    mis_list.append(label[i])
+                features_res[feature] = temp[i]
+            #update predict result
+            if mis_list:
+                err_msg = 'Error: Please fill in '
+                for ele in mis_list:
+                    err_msg = err_msg + ele + ', '
+                return err_msg+' and try again.'
+            else:
+                #temp_res = {'budget': 1, 'vote_count':2, 'popularity':3, 'keyword_power':4, 'youtube_views':5, 'youtube_likes':6, 'revenue':7, 'collection':8}
+                sc_df = spark.createDataFrame(Row(**i) for i in [features_res])
+                sc_df.show()
+                predictions = model.transform(sc_df)
+                predictions.show()
+                prediction = predictions.collect()[0].asDict()['prediction']
+                last_pred = prediction
+                return prediction
 
-        #spark_df = spark.createDataFrame([Row(features_res)])
-        #print(spark_df.schema)
-        #spark_df.show()
-        #update predict result
-        if mis_list:
-            err_msg = 'Error: Please fill in '
-            for ele in mis_list:
-                err_msg = err_msg + ele + ', '
-            return err_msg+' and try again.'
         else:
-            return du_list[n%len(du_list)]
+            return last_pred
     else:
         return None
