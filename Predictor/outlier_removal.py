@@ -18,14 +18,14 @@ def calculate_bounds(df, cols):
     return bounds
     
 def main(input_dir, output_dir):
-    data = spark.read.parquet(input_dir + "/pred_revenue.parquet")
+    data = spark.read.parquet(input_dir + "/pred_revenue_train.parquet")
     data = data.where(data['budget'].isNotNull() & data['revenue'].isNotNull() & data['runtime'].isNotNull())
     print("Data Count before Outlier Removal:" + str(data.count))
     bounds = calculate_bounds(data, ['budget', 'vote_count', 'popularity'])
     filtered_data = data.filter( (data.budget > bounds['budget']['min']) & (data.budget < bounds['budget']['max']) & (data.vote_count > bounds['vote_count']['min']) & (data.vote_count < bounds['vote_count']['max']) & (data.popularity > bounds['popularity']['min']) & (data.popularity < bounds['popularity']['max']) )
     print("Data Count after Outlier Removal:" + str(filtered_data.count))
     print("Saving filtered data at : " + output_dir + "/pred_revenue_filtered.parquet")
-    filtered_data.write.mode('overwrite').parquet(output_dir + "/pred_revenue_filtered.parquet")
+    filtered_data.write.mode('overwrite').parquet(output_dir + "/pred_revenue_train.parquet")
     
 if __name__ == '__main__':
     input_dir = sys.argv[1]
