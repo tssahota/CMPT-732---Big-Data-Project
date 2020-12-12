@@ -37,5 +37,5 @@ if __name__ == '__main__':
     assert spark.version >= "2.4"  # make sure we have Spark 2.4+
     spark.sparkContext.setLogLevel("WARN")
     sc = spark.sparkContext
-    main(input_dir, output_dir
+    main(input_dir, output_dir)
         
