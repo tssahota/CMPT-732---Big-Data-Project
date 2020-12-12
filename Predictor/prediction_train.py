@@ -81,7 +81,7 @@ def main(input_dir, output_dir):
         r2 = r2_evaluator.evaluate(prediction)
         print("R2 Train: ", r2_evaluator.evaluate(model.transform(train)))
         print("R2 Validation: ", r2_evaluator.evaluate(model.transform(validation)))
-        print("R2 Test: ", r2_evaluator.evaluate(r2)
+        print("R2 Test: ", r2_evaluator.evaluate(r2))
         if r2 > best_r2:
                 best_r2 = r2
                 best_model = model
