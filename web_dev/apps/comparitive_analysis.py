@@ -67,10 +67,7 @@ layout = html.Div([
         html.Div(id='task5_p', children=[
             html.P(
                 id="task5_insight",
-                children="† Deaths are classified using the International Classification of Diseases, \
-                Tenth Revision (ICD–10). Drug-poisoning deaths are defined as having ICD–10 underlying \
-                cause-of-death codes X40–X44 (unintentional), X60–X64 (suicide), X85 (homicide), or Y10–Y14 \
-                (undetermined intent).***count of language is the size of bubble here.***",
+                children="Sept-Dec appear to see a spike in numbers of movies released.Overall, action, adventure and fantasy movies seem to be making the most revenue consistently.Animation movies seem to have the highest revenue (possibly because their count is much less) be released most commonly in May and June (presuamably because their target audiences are mostly children who have a break over the summer). Drama movies seem to have the highest count of a movies released each month, with their highest number being from Sept-Dec.",
             ),
         ]),
         dcc.Graph(id='task5_bubble_chart', figure=task5_fig)
@@ -81,10 +78,7 @@ layout = html.Div([
         html.Div(id='task9_p', children=[
             html.P(
                 id="task9_insight",
-                children="† Deaths are classified using the International Classification of Diseases, \
-                Tenth Revision (ICD–10). Drug-poisoning deaths are defined as having ICD–10 underlying \
-                cause-of-death codes X40–X44 (unintentional), X60–X64 (suicide), X85 (homicide), or Y10–Y14 \
-                (undetermined intent).***count of language is the size of bubble here.***",
+                children="Budget and revenue are clearly proportitonal across all genres. Foreign, documentaries and TV movies seem to have the lowest budget and revenue. Whereas animation, family,  fantasy and adventure seem to have the highest budget and revenue. Of these 3 genres, family and animaltion movies seem to relatively more profitable. Also, thriller movies appear to be less profitable.",
             ),
         ]),
         dcc.Graph(id='task9_bubble_chart', figure=task9_fig)
@@ -95,10 +89,7 @@ layout = html.Div([
         html.Div(id='task14_p', children=[
             html.P(
                 id="task14_insight",
-                children="† Deaths are classified using the International Classification of Diseases, \
-                Tenth Revision (ICD–10). Drug-poisoning deaths are defined as having ICD–10 underlying \
-                cause-of-death codes X40–X44 (unintentional), X60–X64 (suicide), X85 (homicide), or Y10–Y14 \
-                (undetermined intent).***count of language is the size of bubble here.***",
+                children="Sept, Dec and Oct see a rise in movie releases (probably due to the holiday season). May and Jun seem to be the most profitable months for movies.",
             ),
         ]),
         dcc.Graph(id='task14_pie_chart', figure=task14_pie_fig),

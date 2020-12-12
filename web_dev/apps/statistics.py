@@ -43,10 +43,7 @@ layout = html.Div([
         html.H2(id='header_task18', style={'text-align': 'center'}, children='Data Distribution & Outliers'),
         html.P(
             id="task18_insight",
-            children="† Deaths are classified using the International Classification of Diseases, \
-            Tenth Revision (ICD–10). Drug-poisoning deaths are defined as having ICD–10 underlying \
-            cause-of-death codes X40–X44 (unintentional), X60–X64 (suicide), X85 (homicide), or Y10–Y14 \
-            (undetermined intent).",
+            children="Descributions and outliers of all variables are shown.",
         ),
         html.Div(id='task18_sub', children=[
             html.Div(id='task18_l', children=[
@@ -77,10 +74,7 @@ layout = html.Div([
         html.H2(id='header_task15', style={'text-align': 'center'}, children='Correlation Heatmap'),
         html.P(
             id="task15_insight",
-            children="† Deaths are classified using the International Classification of Diseases, \
-            Tenth Revision (ICD–10). Drug-poisoning deaths are defined as having ICD–10 underlying \
-            cause-of-death codes X40–X44 (unintentional), X60–X64 (suicide), X85 (homicide), or Y10–Y14 \
-            (undetermined intent).",
+            children="A Correlation heatmap of all continuous variables. Youtube_likes-youtube_dislikes, average_user_rating-critcs_rating, youtube_view-revenue, average_user_rating-budget seem to have the strongest correlations (above 0.7).",
         ),
         #html.P("Included:"),
         # dcc.Checklist(

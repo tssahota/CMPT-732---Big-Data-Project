@@ -241,20 +241,21 @@ def main(input_dir, output_dir):
                                  youtube_df['youtube_dislikes'].cast('int').alias('youtube_dislikes'))
     movietube.cache()
     task18_df = movietube
-    task18_df.show(5)
+    task18_df.describe().show(20)
     task18_df.write.mode('overwrite').parquet(output_dir + "/task18")
     
     
     #***task15***Correlation between continuous quantitative features******
     task15_df = movietube.na.drop(subset=['youtube_views','youtube_likes','youtube_dislikes'])\
                              .select('budget', 'popularity', 'revenue', 'vote_average', 'vote_count', \
-                                'runtime', 'avg_user_rating','tmdb_id','profit' ,'youtube_views','youtube_likes','youtube_dislikes') 
-    assembler = VectorAssembler(inputCols=['budget', 'profit','vote_average', 'vote_count','runtime', 'popularity','revenue', 'avg_user_rating',\
+                                'runtime', 'avg_user_rating','profit' ,'youtube_views','youtube_likes','youtube_dislikes') 
+    assembler = VectorAssembler(inputCols=['budget','vote_average', 'vote_count','runtime', 'popularity','revenue', 'avg_user_rating',\
                                            'youtube_views', 'youtube_likes','youtube_dislikes'],outputCol='features')
     corr_df = assembler.transform(task15_df)
     task15_dense_matrix = Correlation.corr(corr_df, "features").withColumnRenamed('pearson(features)', 'features').head().features
     rows = task15_dense_matrix.toArray().tolist()
-    task15_df = spark.createDataFrame(rows,['budget','popularity', 'revenue', 'vote_average', 'vote_count', 'runtime', 'avg_user_rating'])
+    task15_df = spark.createDataFrame(rows,['budget','popularity', 'revenue', 'vote_average', 'vote_count', 'runtime', 'avg_user_rating',\
+                                            'youtube_views', 'youtube_likes','youtube_dislikes'])
     task15_df.show(10)
     task15_df.write.mode('overwrite').parquet(output_dir + "/task15")
 

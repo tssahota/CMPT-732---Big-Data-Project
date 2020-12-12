@@ -78,56 +78,18 @@ layout = html.Div([
             html.Div(id='task8_p', children=[
                 html.P(
                     id="task8_insight",
-                    children="† Deaths are classified using the International Classification of Diseases, \
-                    Tenth Revision (ICD–10). Drug-poisoning deaths are defined as having ICD–10 underlying \
-                    cause-of-death codes X40–X44 (unintentional), X60–X64 (suicide), X85 (homicide), or Y10–Y14 \
-                    (undetermined intent).***count of language is the size of bubble here.***",
+                    children="English is the most common language for movies, followed by Spanish and French. However, Latin, Chienese and Arabic movies have the highest profits. Whereas Japanese and German movies have much higher Critical ratings.",
                 ),
             ], className="col-md-8"),
         ], className="row"),
         dcc.Graph(id='task8_bubble_chart')
     ]),
 
-    html.Div(id='task11_container', children=[
-        html.H2(id='header_task11', style={'text-align': 'center'}),
-        html.Div(id='task11_sub', children=[
-            html.Div(id='task11_choice', children=[
-                html.Label('X-axis:'),
-                dcc.Dropdown(id="slct_colx_task11",
-                            options=col_list,
-                            multi=False,
-                            value='avg_user_rating',
-                            clearable=False,
-                            ),
-                html.Label('Y-axis:'),
-                dcc.Dropdown(id="slct_coly_task11",
-                            options=col_list,
-                            multi=False,
-                            value="popularity",
-                            clearable=False,
-                            ),
-            ], className="col-md-4"),
-            html.Div(id='task11_p', children=[
-                html.P(
-                    id="task11_insight",
-                    children="† Deaths are classified using the International Classification of Diseases, \
-                    Tenth Revision (ICD–10). Drug-poisoning deaths are defined as having ICD–10 underlying \
-                    cause-of-death codes X40–X44 (unintentional), X60–X64 (suicide), X85 (homicide), or Y10–Y14 \
-                    (undetermined intent).***count of collection is the size of bubble here.***",
-                ),
-            ], className="col-md-8"),
-        ], className="row"),
-        dcc.Graph(id='task11_bubble_chart')
-    ]),
-
     html.Div(id='task10_container', children=[
         html.H2(id='header_task10', style={'text-align': 'center'},children='Most popular production countries' ),
             html.P(
                 id="task10_insight",
-                children="† Deaths are classified using the International Classification of Diseases, \
-                Tenth Revision (ICD–10). Drug-poisoning deaths are defined as having ICD–10 underlying \
-                cause-of-death codes X40–X44 (unintentional), X60–X64 (suicide), X85 (homicide), or Y10–Y14 \
-                (undetermined intent).***count of collection is the size of bubble here.***",
+                children="Besides the US, the UK, and France are most common destinations for movie production, followed by Germany, Canada and India. ",
                 style={'text-align': 'center'}
             ),
         dcc.Graph(id='task10_map_chart', figure=task10_fig)
